@@ -12,12 +12,17 @@
     background:radial-gradient(circle at 50% 15%,#0d3566 0%,#071a33 60%,#030a14 100%);
     font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#fff;
     user-select:none;-webkit-user-select:none;
+    touch-action:manipulation;
   }
-  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  #stage{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:0;
+  }
   canvas#game{
     display:block;background:#000;border-radius:3px;
     image-rendering:pixelated;image-rendering:crisp-edges;
     box-shadow:0 0 0 3px #005aa5,0 0 0 6px #0a1f3d,0 14px 40px rgba(0,0,0,.8);
+    touch-action:none;
   }
   #ui{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;}
   .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
@@ -93,30 +98,66 @@
   .review-item b{color:#ffb066;}
   .review-item .ans{color:#8ef0a0;font-size:11px;display:block;margin-top:4px;}
   .review-item .status{font-size:10px;font-weight:700;letter-spacing:1px;display:block;margin-top:4px;}
+
+  /* ---- CONTROLES DE TOQUE (OVERLAY, SEM RESERVAR ESPAÇO) ---- */
   #touch{
-    position:fixed;left:0;right:0;bottom:0;height:118px;display:flex;
-    justify-content:space-between;align-items:flex-end;padding:0 12px 12px;z-index:25;
-    pointer-events:none;
+    position:fixed;left:0;right:0;bottom:0;
+    padding:0 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    display:flex;justify-content:space-between;align-items:flex-end;gap:8px;
+    z-index:25;pointer-events:none;
   }
-  .tpad{display:flex;gap:12px;pointer-events:none;}
+  .tpad{display:flex;gap:10px;pointer-events:none;}
   .tbtn{
     pointer-events:auto;touch-action:none;width:64px;height:64px;border-radius:14px;
-    background:rgba(0,90,165,.35);border:3px solid rgba(140,196,240,.6);
+    background:rgba(0,90,165,.45);border:3px solid rgba(140,196,240,.65);
     color:#fff;font-size:22px;font-weight:900;font-family:inherit;
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 4px 0 rgba(0,0,0,.45);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
   }
-  .tbtn.on{background:rgba(245,130,32,.65);transform:translateY(3px);box-shadow:none;}
-  .tbtn.jump{width:76px;height:76px;background:rgba(61,143,208,.4);border-color:rgba(255,176,102,.6);}
-  .tbtn.jump.on{background:rgba(245,130,32,.7);}
-  .tbtn.act{width:60px;height:60px;font-size:11px;letter-spacing:1px;background:rgba(245,130,32,.3);border-color:rgba(255,176,102,.6);}
-  .tbtn.act.on{background:rgba(255,176,102,.7);}
+  .tbtn.on{background:rgba(245,130,32,.75);transform:translateY(3px);box-shadow:none;}
+  .tbtn.jump{width:76px;height:76px;background:rgba(61,143,208,.5);border-color:rgba(255,176,102,.7);}
+  .tbtn.jump.on{background:rgba(245,130,32,.8);}
+  .tbtn.act{width:60px;height:60px;font-size:11px;letter-spacing:1px;background:rgba(245,130,32,.4);border-color:rgba(255,176,102,.7);}
+  .tbtn.act.on{background:rgba(255,176,102,.8);}
+
+  @media (max-height: 520px){
+    .tbtn{width:52px;height:52px;font-size:18px;border-radius:12px;}
+    .tbtn.jump{width:62px;height:62px;}
+    .tbtn.act{width:48px;height:48px;font-size:10px;}
+    .tpad{gap:8px;}
+    #touch{padding:0 10px calc(8px + env(safe-area-inset-bottom, 0px));}
+  }
+  @media (min-width:900px) and (pointer:fine){ #touch{display:none;} }
+
   #pauseBtn{
     position:fixed;top:8px;right:8px;z-index:30;width:38px;height:38px;border-radius:9px;
-    background:rgba(0,90,165,.4);border:2px solid rgba(140,196,240,.6);
+    background:rgba(0,90,165,.5);border:2px solid rgba(140,196,240,.7);
     color:#fff;font-size:15px;font-weight:900;font-family:inherit;cursor:pointer;
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
   }
-  @media (min-width:900px){ #touch{display:none;} }
+
+  /* ---- OVERLAY "GIRE O DISPOSITIVO" ---- */
+  #rotate-hint{
+    position:fixed;inset:0;z-index:200;
+    background:rgba(3,10,20,0.96);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;text-align:center;
+  }
+  #rotate-hint.hidden{display:none;}
+  .rotate-content{max-width:340px;}
+  .rotate-icon{
+    font-size:64px;line-height:1;
+    animation:rotate-anim 2.4s infinite ease-in-out;
+    margin-bottom:18px;
+  }
+  @keyframes rotate-anim{
+    0%,20%{transform:rotate(0deg);}
+    50%,70%{transform:rotate(90deg);}
+    100%{transform:rotate(0deg);}
+  }
+  #rotate-hint h3{color:#ffb066;font-size:20px;margin:0 0 10px;letter-spacing:1px;}
+  #rotate-hint p{color:#d0e4ff;font-size:14px;margin:0 0 22px;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -142,7 +183,8 @@
         <div class="kicker">INSTRUÇÕES</div>
         <h2>COMO JOGAR</h2>
         <p><b>Teclado:</b> ← → ou A/D para andar · ESPAÇO / ↑ para pular · <b>E ou ENTER</b> para usar o especial ou a arma · ESC pausa.</p>
-        <p><b>Celular:</b> use os botões na parte inferior da tela.</p>
+        <p><b>Controle (gamepad):</b> analógico esquerdo ou D-pad para andar · <b>A</b> para pular · <b>B / X / Y</b> para ação especial/arma · <b>START</b> pausa.</p>
+        <p><b>Celular:</b> use os botões na parte inferior da tela. Para melhor experiência, use na horizontal.</p>
         <p><b>Salto duplo:</b> pressione pular novamente no ar para dar um segundo salto!</p>
         <p>Pule sobre os <b>carrinhos de supermercado</b> que aparecem pelo caminho. Colete moedas. Toque nos blocos <b style="color:#ffb066">?</b> para responder aos desafios pedagógicos.</p>
         <p><b>★ 3 tipos de carrinho:</b> vermelho (pula), laranja (rola) e tecnológico (flutua). Cuidado com cada um!</p>
@@ -278,6 +320,15 @@
       <button class="tbtn jump" data-key="jump">▲</button>
     </div>
   </div>
+
+  <div id="rotate-hint" class="hidden">
+    <div class="rotate-content">
+      <div class="rotate-icon">📱</div>
+      <h3>GIRE SEU DISPOSITIVO</h3>
+      <p>Para uma experiência muito melhor, jogue com o celular na <b>horizontal</b>.</p>
+      <button class="btn" id="rotate-dismiss">JOGAR NA VERTICAL</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -381,20 +432,27 @@ const Snd={
 };
 
 /* =========================================================================
-   ENTRADA
+   ENTRADA — 3 FONTES: TECLADO / TOQUE / GAMEPAD (mescladas por frame)
    ========================================================================= */
 const input={left:false,right:false,jump:false,action:false,actionPressed:false,jumpBuf:0};
-function pressJump(){ input.jump=true; input.jumpBuf=8; }
+const keyInput={left:false,right:false,jump:false,action:false};
+const touchInput={left:false,right:false,jump:false,action:false};
+const padInput={left:false,right:false,jump:false,action:false,startHeld:false,connected:false};
 
+function pressJumpBuffer(){ input.jumpBuf=8; }
+
+/* ---------- TECLADO ---------- */
 window.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   const blocked=['arrowleft','arrowright','arrowup','arrowdown',' ','spacebar','enter'];
   if(blocked.indexOf(k)>=0) e.preventDefault();
   Snd.resume();
-  if(k==='arrowleft'||k==='a') input.left=true;
-  else if(k==='arrowright'||k==='d') input.right=true;
-  else if(k==='arrowup'||k==='w'||k===' '||e.code==='Space'){ if(!input.jump) pressJump(); }
-  else if(k==='e'||k==='enter'){ if(!input.action) input.actionPressed=true; input.action=true; }
+  if(k==='arrowleft'||k==='a') keyInput.left=true;
+  else if(k==='arrowright'||k==='d') keyInput.right=true;
+  else if(k==='arrowup'||k==='w'||k===' '||e.code==='Space'){
+    if(!keyInput.jump){ keyInput.jump=true; pressJumpBuffer(); }
+  }
+  else if(k==='e'||k==='enter'){ keyInput.action=true; }
   else if(k==='escape'){
     if(game.state==='playing') doPause();
     else if(game.state==='paused') doResume();
@@ -402,27 +460,30 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{
   const k=e.key.toLowerCase();
-  if(k==='arrowleft'||k==='a') input.left=false;
-  else if(k==='arrowright'||k==='d') input.right=false;
-  else if(k==='arrowup'||k==='w'||k===' '||e.code==='Space') input.jump=false;
-  else if(k==='e'||k==='enter') input.action=false;
+  if(k==='arrowleft'||k==='a') keyInput.left=false;
+  else if(k==='arrowright'||k==='d') keyInput.right=false;
+  else if(k==='arrowup'||k==='w'||k===' '||e.code==='Space') keyInput.jump=false;
+  else if(k==='e'||k==='enter') keyInput.action=false;
 });
 
+/* ---------- TOQUE ---------- */
 function bindTouchButtons(){
   document.querySelectorAll('#touch .tbtn').forEach(btn=>{
     const key=btn.dataset.key;
     const down=ev=>{
       ev.preventDefault(); Snd.resume();
-      if(key==='jump'){ if(!input.jump) pressJump(); }
-      else if(key==='action'){ if(!input.action) input.actionPressed=true; input.action=true; }
-      else input[key]=true;
+      if(key==='jump'){
+        if(!touchInput.jump){ touchInput.jump=true; pressJumpBuffer(); }
+      }
+      else if(key==='action'){ touchInput.action=true; }
+      else { touchInput[key]=true; }
       btn.classList.add('on');
     };
     const up=ev=>{
       ev.preventDefault();
-      if(key==='jump') input.jump=false;
-      else if(key==='action') input.action=false;
-      else input[key]=false;
+      if(key==='jump') touchInput.jump=false;
+      else if(key==='action') touchInput.action=false;
+      else touchInput[key]=false;
       btn.classList.remove('on');
     };
     btn.addEventListener('pointerdown',down);
@@ -433,8 +494,73 @@ function bindTouchButtons(){
   });
 }
 
+/* ---------- GAMEPAD ---------- */
+let gamepadIndex=-1;
+function isBtnDown(gp, idx){
+  const b=gp.buttons[idx];
+  return !!(b && (b.pressed || b.value>0.5));
+}
+function pollGamepad(){
+  if(!navigator.getGamepads) return;
+  let gp=null;
+  try{
+    const pads=navigator.getGamepads();
+    if(gamepadIndex>=0 && pads[gamepadIndex]) gp=pads[gamepadIndex];
+    else{
+      for(let i=0;i<pads.length;i++){ if(pads[i] && pads[i].connected){ gp=pads[i]; gamepadIndex=i; break; } }
+    }
+  }catch(e){ return; }
+
+  if(!gp){
+    if(padInput.connected){
+      padInput.connected=false;
+      padInput.left=padInput.right=padInput.jump=padInput.action=false;
+      padInput.startHeld=false;
+    }
+    return;
+  }
+  if(!padInput.connected){
+    padInput.connected=true;
+    if(typeof game!=='undefined' && game.state==='playing'){
+      game.flash='GAMEPAD CONECTADO!'; game.flashT=90;
+    }
+  }
+
+  const ax=gp.axes[0]||0;
+  const DEADZONE=0.28;
+  const dpadL=isBtnDown(gp,14), dpadR=isBtnDown(gp,15);
+  padInput.left  = ax<-DEADZONE || dpadL;
+  padInput.right = ax> DEADZONE || dpadR;
+  padInput.jump   = isBtnDown(gp,0) || isBtnDown(gp,12);   // A ou D-pad ↑
+  padInput.action = isBtnDown(gp,1) || isBtnDown(gp,2) || isBtnDown(gp,3); // B/X/Y
+
+  // Pausa via START (edge)
+  const startNow=isBtnDown(gp,9);
+  if(startNow && !padInput.startHeld){
+    if(typeof game!=='undefined'){
+      if(game.state==='playing') doPause();
+      else if(game.state==='paused') doResume();
+    }
+  }
+  padInput.startHeld=startNow;
+}
+
+/* ---------- MERGE POR FRAME ---------- */
+function mergeInputs(){
+  const prevJump=input.jump;
+  const prevAction=input.action;
+
+  input.left  = keyInput.left  || touchInput.left  || padInput.left;
+  input.right = keyInput.right || touchInput.right || padInput.right;
+  input.jump  = keyInput.jump  || touchInput.jump  || padInput.jump;
+  input.action= keyInput.action|| touchInput.action|| padInput.action;
+
+  if(input.jump && !prevJump) pressJumpBuffer();
+  if(input.action && !prevAction) input.actionPressed=true;
+}
+
 /* =========================================================================
-   BANCO DE MISSÕES OBRIGATÓRIAS (8, ordem fixa, do DOCX)
+   BANCO DE MISSÕES OBRIGATÓRIAS (8, ordem fixa)
    ========================================================================= */
 const MISSIONS=[
   { id:1, phase:0, type:'single',
@@ -493,7 +619,7 @@ const BOSSES={
 };
 
 /* =========================================================================
-   FASES — carrinhos de supermercado como inimigos
+   FASES
    ========================================================================= */
 const G=(x,w,y,h)=>({x:x,y:(y===undefined?200:y),w:w,h:(h===undefined?16:h),type:'ground'});
 const P=(x,y,w,h,t)=>({x:x,y:y,w:w,h:h,type:t||'brick'});
@@ -1269,7 +1395,7 @@ function killPlayer(){
 }
 
 /* =========================================================================
-   UPDATE INIMIGOS — carrinhos de supermercado
+   UPDATE INIMIGOS
    ========================================================================= */
 function updateEnemies(){
   const p=game.player;
@@ -1508,7 +1634,7 @@ function update(){
 }
 
 /* =========================================================================
-   DESENHO — FUNDOS (temática Senac: azul, laranja, branco)
+   DESENHO — FUNDOS
    ========================================================================= */
 function repeatX(spacing,offset,fn){
   const start=-(((offset%spacing)+spacing)%spacing);
@@ -1862,9 +1988,6 @@ function drawCoinSprite(c){
   }
 }
 
-/* =========================================================================
-   DESENHO DOS INIMIGOS — CARRINHOS DE SUPERMERCADO
-   ========================================================================= */
 function drawEnemy(e){
   const x=Math.round(e.x), y=Math.round(e.y);
   if(e.dead){
@@ -1875,7 +1998,6 @@ function drawEnemy(e){
     return;
   }
   if(e.type==='cart_jumpy'){
-    // CARRINHO VERMELHO (perigoso) — pula
     ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(x, y+11, 12, 2);
     ctx.fillStyle='#1a1a1a';
     ctx.fillRect(x+2, y+9, 3, 2); ctx.fillRect(x+8, y+9, 3, 2);
@@ -1897,7 +2019,6 @@ function drawEnemy(e){
     }
   }
   else if(e.type==='cart'){
-    // CARRINHO LARANJA — rola
     const wheelPhase = Math.floor(e.t/4)%2;
     ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(x, y+11, 12, 2);
     ctx.fillStyle='#1a1a1a';
@@ -1920,7 +2041,6 @@ function drawEnemy(e){
     }
   }
   else if(e.type==='cart_flying'){
-    // CARRINHO TECNOLÓGICO — flutua
     const bob=Math.sin(e.t*0.1)*1.5;
     ctx.globalAlpha=0.4; ctx.fillStyle='#005aa5';
     ctx.fillRect(x, y+10+bob, 14, 3); ctx.globalAlpha=1;
@@ -2202,10 +2322,7 @@ function drawPlayerBeams(){
   }
 }
 
-/* =========================================================================
-   DESENHO DOS CHEFES — CARRINHOS DE SUPERMERCADO MONSTRUOSOS
-   Cada um com personalidade e postura própria
-   ========================================================================= */
+/* -------------------- DESENHO DOS CHEFES -------------------- */
 function drawBoss(){
   const b=game.boss; if(!b) return;
   const x=Math.round(b.x), y=Math.round(b.y);
@@ -2224,50 +2341,41 @@ function drawBoss(){
   }
 }
 
-/* CARRINHO DA DÚVIDA — hesitante, curvado, ponto de interrogação na haste */
 function drawBossDoubt(x,y,b){
   const wob=Math.sin(b.t*0.09)*2;
   const eye=Math.sin(b.t*0.14)*1;
   ctx.globalAlpha=0.18+Math.sin(b.t*0.12)*0.08;
   ctx.fillStyle='#005aa5'; ctx.fillRect(x-4,y-4,48,48);
   ctx.globalAlpha=1;
-  // Rodinhas nervosas
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+4+wob*0.5, y+33, 8, 7);
   ctx.fillRect(x+28-wob*0.5, y+33, 8, 7);
   ctx.fillStyle='#3d8fd0';
   ctx.fillRect(x+6+wob*0.5, y+35, 4, 2);
   ctx.fillRect(x+30-wob*0.5, y+35, 4, 2);
-  // Hastes
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+6, y+28, 4, 6);
   ctx.fillRect(x+30, y+28, 4, 6);
-  // Cesto (curvado)
   const bx=x+2+wob*0.3, by=y+6;
   ctx.fillStyle='#003d73'; ctx.fillRect(bx, by, 36, 24);
   ctx.fillStyle='#005aa5'; ctx.fillRect(bx+2, by+2, 32, 20);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(bx+3, by+3, 30, 6);
-  // Grade
   ctx.fillStyle='#003d73';
   for(let i=0;i<4;i++) ctx.fillRect(bx+6+i*8, by+9, 2, 15);
   ctx.fillRect(bx+3, by+14, 30, 2);
-  // Olhos grandes e preocupados
   ctx.fillStyle='#ffffff'; ctx.fillRect(bx+6, by+16+eye, 10, 8);
   ctx.fillStyle='#ffffff'; ctx.fillRect(bx+20, by+16-eye, 10, 8);
   ctx.fillStyle='#005aa5'; ctx.fillRect(bx+9, by+18+eye, 4, 5);
   ctx.fillStyle='#005aa5'; ctx.fillRect(bx+23, by+18-eye, 4, 5);
   ctx.fillStyle='#030a14'; ctx.fillRect(bx+10, by+19+eye, 2, 2);
   ctx.fillRect(bx+24, by+19-eye, 2, 2);
-  // Sobrancelhas preocupadas
   ctx.fillStyle='#030a14';
   ctx.fillRect(bx+6, by+14+eye, 10, 2);
   ctx.fillRect(bx+20, by+14-eye, 10, 2);
-  // Boca ondulada (nervosa)
   ctx.fillStyle='#030a14';
   ctx.fillRect(bx+14, by+27, 3, 1);
   ctx.fillRect(bx+17, by+28, 3, 1);
   ctx.fillRect(bx+20, by+27, 3, 1);
-  // Haste com ponto de interrogação
   ctx.fillStyle='#003d73'; ctx.fillRect(bx+32, by-14, 3, 28);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(bx+32, by-14, 1.5, 28);
   const qBob=Math.sin(b.t*0.11)*2;
@@ -2281,23 +2389,19 @@ function drawBossDoubt(x,y,b){
   ctx.fillRect(bx+32, by-14+qBob, 2, 2);
 }
 
-/* CARRINHO DO CAOS — transbordando, tremendo, três olhos */
 function drawBossChaos(x,y,b){
   const shake=Math.sin(b.t*0.3)*1.5;
   ctx.globalAlpha=0.15+Math.sin(b.t*0.2)*0.1;
   ctx.fillStyle='#f58220'; ctx.fillRect(x-4,y-6,52,50); ctx.globalAlpha=1;
-  // Rodinhas tortas
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+4, y+34+shake, 8, 7);
   ctx.fillRect(x+30, y+34-shake, 8, 7);
   ctx.fillStyle='#f58220'; ctx.fillRect(x+6, y+36, 4, 2); ctx.fillRect(x+32, y+36, 4, 2);
   ctx.fillStyle='#030a14'; ctx.fillRect(x+6, y+30, 4, 5); ctx.fillRect(x+32, y+30, 4, 5);
-  // Cesto transbordando
   ctx.fillStyle='#003d73'; ctx.fillRect(x+1, y+14, 42, 18);
   ctx.fillStyle='#005aa5'; ctx.fillRect(x+3, y+16, 38, 14);
   ctx.fillStyle='#003d73';
   for(let i=0;i<5;i++) ctx.fillRect(x+6+i*7, y+16, 2, 14);
-  // Jornais/papéis transbordando
   for(let i=0;i<5;i++){
     const px=x+4+i*7, py=y+2+Math.sin(b.t*0.1+i)*2;
     ctx.fillStyle=(i%2)?'#ffffff':'#ffb066';
@@ -2305,7 +2409,6 @@ function drawBossChaos(x,y,b){
     ctx.fillStyle='#005aa5'; ctx.fillRect(px+1, py+2, 4, 1);
     ctx.fillRect(px+1, py+4, 3, 1);
   }
-  // Três olhos caóticos de tamanhos diferentes
   const eyes=[
     {x:x+7,y:y+20,w:8,h:6},
     {x:x+19,y:y+18,w:10,h:8},
@@ -2316,14 +2419,11 @@ function drawBossChaos(x,y,b){
     ctx.fillStyle='#f58220'; ctx.fillRect(e.x+2,e.y+2,e.w-4,e.h-2);
     ctx.fillStyle='#030a14'; ctx.fillRect(e.x+e.w/2-1,e.y+e.h/2-1,2,2);
   });
-  // Boca aberta gritando
   ctx.fillStyle='#030a14'; ctx.fillRect(x+14, y+27, 16, 4);
   ctx.fillStyle='#e8451c'; ctx.fillRect(x+16, y+28, 12, 2);
-  // Haste entortada
   ctx.fillStyle='#003d73'; ctx.fillRect(x+38, y-4, 3, 30);
   ctx.fillRect(x+38, y-4, 8, 3);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(x+38, y-4, 1.5, 30);
-  // Símbolos voando
   for(let i=0;i<3;i++){
     const ang=b.t*0.05+i*2.1;
     const px=x+22+Math.cos(ang)*22;
@@ -2333,9 +2433,7 @@ function drawBossChaos(x,y,b){
   }
 }
 
-/* CARRINHO DA PRESSA — inclinado, veloz, agressivo */
 function drawBossHaste(x,y,b){
-  // Linhas de velocidade
   ctx.globalAlpha=0.6;
   for(let i=0;i<3;i++){
     const sy=y+16+i*8;
@@ -2345,7 +2443,6 @@ function drawBossHaste(x,y,b){
   }
   ctx.globalAlpha=1;
   ctx.globalAlpha=0.18; ctx.fillStyle='#f58220'; ctx.fillRect(x-2,y+2,50,42); ctx.globalAlpha=1;
-  // Rodinhas girando rápido
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+6, y+36, 9, 6);
   ctx.fillRect(x+30, y+36, 9, 6);
@@ -2355,7 +2452,6 @@ function drawBossHaste(x,y,b){
   ctx.fillStyle='#ffb066';
   ctx.fillRect(x+10, y+37, 1, 4);
   ctx.fillRect(x+34, y+37, 1, 4);
-  // Cesto inclinado para frente (laranja)
   const bx=x+1, by=y+8;
   ctx.fillStyle='#8a3d00'; ctx.fillRect(bx, by, 44, 26);
   ctx.fillStyle='#f58220'; ctx.fillRect(bx+2, by+2, 40, 22);
@@ -2363,7 +2459,6 @@ function drawBossHaste(x,y,b){
   ctx.fillStyle='#8a3d00';
   for(let i=0;i<5;i++) ctx.fillRect(bx+8+i*7, by+6, 2, 18);
   ctx.fillRect(bx+2, by+14, 40, 2);
-  // Olhos raivosos inclinados
   ctx.fillStyle='#ffffff';
   ctx.fillRect(bx+8, by+9, 8, 6);
   ctx.fillRect(bx+24, by+9, 8, 6);
@@ -2376,11 +2471,9 @@ function drawBossHaste(x,y,b){
   ctx.fillStyle='#030a14';
   ctx.fillRect(bx+11, by+12, 2, 2);
   ctx.fillRect(bx+27, by+12, 2, 2);
-  // Boca com dentes
   ctx.fillStyle='#030a14'; ctx.fillRect(bx+14, by+20, 16, 4);
   ctx.fillStyle='#ffffff';
   for(let i=0;i<4;i++) ctx.fillRect(bx+15+i*4, by+20, 2, 2);
-  // Haste como punho erguido
   ctx.fillStyle='#8a3d00'; ctx.fillRect(bx+40, by-16, 4, 30);
   ctx.fillStyle='#f58220'; ctx.fillRect(bx+40, by-16, 2, 30);
   ctx.fillStyle='#8a3d00';
@@ -2389,61 +2482,48 @@ function drawBossHaste(x,y,b){
   ctx.fillRect(bx+43, by-24, 3, 6);
 }
 
-/* CARRINHO DO GOLPE — rosto de tela, encapuzado, sinistro */
 function drawBossScam(x,y,b){
   const glitch=Math.sin(b.t*0.4)*1;
   ctx.globalAlpha=0.25; ctx.fillStyle='#005aa5'; ctx.fillRect(x-3,y-2,50,48); ctx.globalAlpha=1;
-  // Rodinhas
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+5+glitch, y+37, 8, 6);
   ctx.fillRect(x+31-glitch, y+37, 8, 6);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(x+7+glitch, y+39, 4, 2);
   ctx.fillRect(x+33-glitch, y+39, 4, 2);
   ctx.fillStyle='#030a14'; ctx.fillRect(x+7, y+32, 4, 5); ctx.fillRect(x+33, y+32, 4, 5);
-  // Cesto escuro
   ctx.fillStyle='#030a14'; ctx.fillRect(x+1, y+10, 42, 22);
   ctx.fillStyle='#071a33'; ctx.fillRect(x+3, y+12, 38, 18);
-  // Rosto como tela
   ctx.fillStyle='#030a14'; ctx.fillRect(x+5, y+14, 34, 18);
   ctx.fillStyle='#0d3566'; ctx.fillRect(x+7, y+16, 30, 14);
-  // Scanlines
   for(let i=0;i<4;i++){
     const ly=y+16+i*3+Math.sin(b.t*0.2+i)*1;
     const lw=10+Math.sin(b.t*0.15+i*2)*8;
     ctx.fillStyle='#3d8fd0'; ctx.fillRect(x+8, ly, lw, 1);
   }
-  // Ícone de máscara
   ctx.fillStyle='#f58220'; ctx.fillRect(x+18, y+20, 8, 4);
   ctx.fillStyle='#030a14'; ctx.fillRect(x+20, y+21, 4, 2);
-  // Olhos sorrateiros
   ctx.fillStyle='#e8451c';
   ctx.fillRect(x+11, y+18, 4, 3);
   ctx.fillRect(x+29, y+18, 4, 3);
-  // Capuz
   ctx.fillStyle='#030a14'; ctx.fillRect(x+4, y+8, 36, 4);
   ctx.fillRect(x+6, y+5, 32, 4);
   ctx.fillRect(x+10, y+2, 24, 4);
-  // Haste com anzol
   ctx.fillStyle='#030a14'; ctx.fillRect(x+38, y-8, 3, 20);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(x+38, y-8, 1.5, 20);
   ctx.fillStyle='#3d8fd0';
   ctx.fillRect(x+38, y-12, 8, 3);
   ctx.fillRect(x+44, y-12, 3, 6);
   ctx.fillStyle='#f58220'; ctx.fillRect(x+44, y-8, 3, 2);
-  // Linha de pesca (phishing)
   const lineY=y-4+Math.sin(b.t*0.1)*3;
   ctx.strokeStyle='#3d8fd0'; ctx.lineWidth=0.5;
   ctx.beginPath(); ctx.moveTo(x+38, y-8); ctx.lineTo(x+32, lineY); ctx.stroke();
-  // Moeda falsa na ponta
   ctx.fillStyle='#f58220'; ctx.fillRect(x+30, lineY, 4, 4);
   ctx.fillStyle='#ffb066'; ctx.fillRect(x+31, lineY+1, 2, 2);
 }
 
-/* CARRINHO GUARDIÃO — blindado, coroado, imponente */
 function drawBossGuardian(x,y,b){
   const glow=0.5+Math.sin(b.t*0.08)*0.4;
   ctx.globalAlpha=glow*0.4; ctx.fillStyle='#f58220'; ctx.fillRect(x-8,y-10,64,66); ctx.globalAlpha=1;
-  // Capa atrás
   ctx.fillStyle='#003d73';
   ctx.fillRect(x-2, y+10, 52, 34);
   ctx.fillRect(x+2, y+44, 44, 4);
@@ -2453,7 +2533,6 @@ function drawBossGuardian(x,y,b){
   ctx.fillRect(x+8, y+12, 1, 30);
   ctx.fillRect(x+24, y+12, 1, 30);
   ctx.fillRect(x+40, y+12, 1, 30);
-  // Rodas grandes blindadas
   ctx.fillStyle='#030a14';
   ctx.fillRect(x+4, y+38, 10, 8);
   ctx.fillRect(x+34, y+38, 10, 8);
@@ -2461,21 +2540,17 @@ function drawBossGuardian(x,y,b){
   ctx.fillRect(x+6, y+40, 6, 2);
   ctx.fillRect(x+36, y+40, 6, 2);
   ctx.fillStyle='#ffb066'; ctx.fillRect(x+8, y+41, 2, 1); ctx.fillRect(x+38, y+41, 2, 1);
-  // Cesto blindado
   ctx.fillStyle='#003d73'; ctx.fillRect(x+4, y+12, 40, 28);
   ctx.fillStyle='#005aa5'; ctx.fillRect(x+6, y+14, 36, 24);
-  // Filetes dourados
   ctx.fillStyle='#f58220'; ctx.fillRect(x+4, y+12, 40, 3);
   ctx.fillRect(x+4, y+36, 40, 3);
   ctx.fillStyle='#ffb066'; ctx.fillRect(x+5, y+12, 38, 1);
   ctx.fillStyle='#003d73';
   for(let i=0;i<4;i++) ctx.fillRect(x+10+i*8, y+16, 2, 20);
-  // Emblema de escudo
   ctx.fillStyle='#f58220'; ctx.fillRect(x+16, y+20, 16, 12);
   ctx.fillStyle='#ffb066'; ctx.fillRect(x+17, y+21, 14, 10);
   ctx.fillStyle='#005aa5'; ctx.fillRect(x+20, y+23, 8, 6);
   ctx.fillStyle='#ffffff'; ctx.fillRect(x+22, y+24, 4, 4);
-  // Olhos brilhantes
   ctx.fillStyle='#f58220';
   ctx.globalAlpha=glow;
   ctx.fillRect(x+14, y+16, 6, 3);
@@ -2484,10 +2559,8 @@ function drawBossGuardian(x,y,b){
   ctx.fillStyle='#ffffff';
   ctx.fillRect(x+16, y+17, 2, 1);
   ctx.fillRect(x+30, y+17, 2, 1);
-  // Haste como cetro
   ctx.fillStyle='#003d73'; ctx.fillRect(x+42, y-8, 4, 30);
   ctx.fillStyle='#f58220'; ctx.fillRect(x+42, y-8, 2, 30);
-  // Coroa
   ctx.fillStyle='#f58220';
   ctx.fillRect(x+38, y-16, 12, 4);
   ctx.fillRect(x+38, y-20, 2, 4);
@@ -2496,7 +2569,6 @@ function drawBossGuardian(x,y,b){
   ctx.fillStyle='#ffb066';
   ctx.fillRect(x+39, y-16, 10, 1);
   ctx.fillStyle='#3d8fd0'; ctx.fillRect(x+43, y-17, 2, 2);
-  // Escudo no braço esquerdo
   ctx.fillStyle='#030a14'; ctx.fillRect(x-4, y+18, 8, 16);
   ctx.fillStyle='#005aa5'; ctx.fillRect(x-3, y+19, 6, 14);
   ctx.fillStyle='#f58220'; ctx.fillRect(x-1, y+22, 2, 8);
@@ -2655,7 +2727,7 @@ function render(){
 }
 
 /* =========================================================================
-   LOOP
+   LOOP — inclui pollGamepad + mergeInputs por frame
    ========================================================================= */
 const STEP=1000/60;
 let acc=0, lastT=performance.now();
@@ -2664,6 +2736,11 @@ function loop(t){
   let dt=t-lastT; lastT=t;
   if(dt>100) dt=100;
   acc+=dt;
+
+  // Fontes de input mescladas por frame
+  pollGamepad();
+  mergeInputs();
+
   let steps=0;
   while(acc>=STEP && steps<5){ update(); acc-=STEP; steps++; }
   if(steps>=5) acc=0;
@@ -2722,25 +2799,89 @@ window.addEventListener('blur',()=>{
 /* ---------------- RESPONSIVIDADE ---------------- */
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0)||
               (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
-function fit(){
-  const touchVisible=isTouch && window.innerWidth<900;
-  const reserve=touchVisible?126:16;
-  const availW=window.innerWidth-16;
-  const availH=window.innerHeight-reserve;
-  let s=Math.min(availW/CW,availH/CH);
-  if(s>=1){ s=Math.max(1,Math.floor(s*4)/4); }
-  else{ s=Math.max(0.35,s); }
-  canvas.style.width=Math.round(CW*s)+'px';
-  canvas.style.height=Math.round(CH*s)+'px';
+
+function getViewport(){
+  const vv=window.visualViewport;
+  return {
+    w: vv ? vv.width  : window.innerWidth,
+    h: vv ? vv.height : window.innerHeight
+  };
 }
-window.addEventListener('resize',fit);
-window.addEventListener('orientationchange',()=>setTimeout(fit,120));
+
+function fit(){
+  const {w:W, h:H} = getViewport();
+
+  // Em telas pequenas (mobile) usamos toda a área. Em desktop mantemos margem.
+  const isSmall = W < 900 || H < 520;
+  const margin = isSmall ? 0 : 16;
+
+  const availW = Math.max(120, W - margin*2);
+  const availH = Math.max(80,  H - margin*2);
+
+  let s = Math.min(availW/CW, availH/CH);
+
+  // Ajuste de escala
+  if(s >= 1) s = Math.floor(s*4)/4;   // steps de 0.25 para nitidez
+  if(s < 0.30) s = 0.30;
+  if(s > 6) s = 6;
+
+  canvas.style.width  = Math.round(CW*s) + 'px';
+  canvas.style.height = Math.round(CH*s) + 'px';
+}
+
+/* ---- HINT DE ORIENTAÇÃO ---- */
+function checkRotateHint(){
+  const el=document.getElementById('rotate-hint');
+  if(!el) return;
+  const {w:W, h:H}=getViewport();
+  const isMobile = Math.min(W,H) < 900;
+  const isPortrait = H > W;
+  const dismissed = sessionStorage.getItem('rotateDismissed')==='1';
+  if(isMobile && isPortrait && !dismissed && game.state==='playing'){
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
+}
+document.getElementById('rotate-dismiss').addEventListener('click',()=>{
+  sessionStorage.setItem('rotateDismissed','1');
+  document.getElementById('rotate-hint').classList.add('hidden');
+  // Recalcula tamanho após o usuário escolher
+  setTimeout(fit, 50);
+});
+
+window.addEventListener('resize',()=>{ fit(); checkRotateHint(); });
+window.addEventListener('orientationchange',()=>{ setTimeout(()=>{ fit(); checkRotateHint(); },150); });
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', fit);
+  // NÃO usar o scroll para evitar travar em mobile
+}
+
+/* ---- GAMEPAD CONNECT/DISCONNECT ---- */
+window.addEventListener('gamepadconnected', e=>{
+  gamepadIndex=e.gamepad.index;
+  padInput.connected=true;
+  if(game.state==='playing'){
+    game.flash='GAMEPAD CONECTADO!'; game.flashT=90;
+  }
+  // Chuta o som/music em mobile/desktop
+  Snd.init(); Snd.resume();
+});
+window.addEventListener('gamepaddisconnected', e=>{
+  gamepadIndex=-1;
+  padInput.connected=false;
+  padInput.left=padInput.right=padInput.jump=padInput.action=false;
+  if(game.state==='playing'){
+    game.flash='GAMEPAD DESCONECTADO'; game.flashT=90;
+  }
+});
 
 /* =========================================================================
    INICIALIZAÇÃO
    ========================================================================= */
 function init(){
-  if(isTouch && window.innerWidth<900){
+  if(isTouch && Math.min(window.innerWidth,window.innerHeight) < 900){
     document.getElementById('touch').classList.remove('hidden');
   }
   bindTouchButtons();
@@ -2751,6 +2892,7 @@ function init(){
   refreshContinue();
   showScreen('menu');
   game.state='menu';
+  checkRotateHint();
   requestAnimationFrame(loop);
 }
 

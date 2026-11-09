@@ -99,6 +99,17 @@
   .review-item .ans{color:#8ef0a0;font-size:11px;display:block;margin-top:4px;}
   .review-item .status{font-size:10px;font-weight:700;letter-spacing:1px;display:block;margin-top:4px;}
 
+  /* ---- FOCO PARA JOYSTICK ---- */
+  .btn.focus,
+  .opt.focus{
+    outline:3px solid #ffffff;
+    outline-offset:2px;
+    box-shadow:0 0 0 3px #f58220,0 0 18px #f58220,0 4px 0 #030a14;
+    transform:translateY(-1px);
+  }
+  .opt.focus{background:#134a8a;}
+  .opt.selected.focus{background:#1a5a9a;}
+
   /* ---- CONTROLES DE TOQUE (OVERLAY, SEM RESERVAR ESPAÇO) ---- */
   #touch{
     position:fixed;left:0;right:0;bottom:0;
@@ -183,12 +194,12 @@
         <div class="kicker">INSTRUÇÕES</div>
         <h2>COMO JOGAR</h2>
         <p><b>Teclado:</b> ← → ou A/D para andar · ESPAÇO / ↑ para pular · <b>E ou ENTER</b> para usar o especial ou a arma · ESC pausa.</p>
-        <p><b>Controle (gamepad):</b> analógico esquerdo ou D-pad para andar · <b>A</b> para pular · <b>B / X / Y</b> para ação especial/arma · <b>START</b> pausa.</p>
+        <p><b>Controle (gamepad):</b> analógico esquerdo ou D-pad para andar · <b>A</b> para pular · <b>B / X / Y</b> para ação especial/arma · <b>START</b> pausa. Nos menus, use D-pad/analógico e A para confirmar.</p>
         <p><b>Celular:</b> use os botões na parte inferior da tela. Para melhor experiência, use na horizontal.</p>
         <p><b>Salto duplo:</b> pressione pular novamente no ar para dar um segundo salto!</p>
         <p>Pule sobre os <b>carrinhos de supermercado</b> que aparecem pelo caminho. Colete moedas. Toque nos blocos <b style="color:#ffb066">?</b> para responder aos desafios pedagógicos.</p>
         <p><b>★ 3 tipos de carrinho:</b> vermelho (pula), laranja (rola) e tecnológico (flutua). Cuidado com cada um!</p>
-        <p><b>★ 8 desafios obrigatórios:</b> cada fase tem uma ou duas missões pedagógicas. As missões aparecem na ordem, sem sorteio, para que nenhum conteúdo fique de fora.</p>
+        <p><b>★ 8 desafios por jornada:</b> as questões são sorteadas de um banco com 48 perguntas sobre recursos tecnológicos, atendimento, abastecimento, comunicação, logística e prevenção de perdas.</p>
         <p><b>★ Tipos de desafio:</b> alternativa única, múltiplas respostas (marque todas e confirme) e verdadeiro ou falso.</p>
         <p><b>★ Arma da Fase:</b> cada fase tem uma arma especial. Ela só aparece no cenário depois que você acerta o primeiro desafio da fase. Caminhe sobre ela para coletar!</p>
         <p>Durante a luta contra o chefe, pressione <b>E / AÇÃO</b> para desferir o <b>golpe da arma</b> — muito mais forte que o pulo. Você também pode usar o <b>Golpe do Aprendiz</b> acumulado nos acertos.</p>
@@ -202,7 +213,7 @@
       <div class="panel">
         <div class="kicker">CRÉDITOS</div>
         <h2>DESBLOQUEIE SEU FUTURO</h2>
-        <p>Jogo pedagógico desenvolvido para apresentar os primeiros passos rumo à Aprendizagem Profissional: requisitos, canais confiáveis, preparação da candidatura, formação profissional e proteção de dados.</p>
+        <p>Jogo pedagógico desenvolvido para apresentar conhecimentos profissionais do curso de Aprendizagem em Serviços de Supermercados: recursos tecnológicos, atendimento, abastecimento, comunicação, logística e prevenção de perdas.</p>
         <p>Arte em pixel art, programação, trilha e efeitos sonoros gerados proceduralmente em HTML5 + Canvas + Web Audio API.</p>
         <p class="tip">Nenhum recurso externo é utilizado. Funciona offline. O jogo não solicita dados pessoais reais.</p>
         <button class="btn" data-act="back">VOLTAR</button>
@@ -271,8 +282,8 @@
       <div class="panel">
         <div class="kicker">JORNADA CONCLUÍDA</div>
         <h1 class="logo small">SEU FUTURO COMEÇA AGORA!</h1>
-        <p>Parabéns! Você percorreu a jornada do Jovem Aprendiz: conheceu os requisitos, descobriu canais confiáveis, preparou sua candidatura, entendeu o papel da formação e aprendeu a proteger seus dados.</p>
-        <p class="tip">O Programa de Aprendizagem oferece formação profissional, mas não garante contratação automática. Continue estudando, mantendo o currículo atualizado e buscando oportunidades em canais oficiais.</p>
+        <p>Parabéns! Você percorreu a jornada e desenvolveu conhecimentos sobre recursos tecnológicos, atendimento ao cliente, abastecimento, comunicação, logística e prevenção de perdas no supermercado.</p>
+        <p class="tip">Continue estudando e praticando. A formação profissional é um passo importante para o seu futuro.</p>
         <div class="stats" id="victory-stats"></div>
         <div class="menu-btns">
           <button class="btn big" data-act="again">JOGAR NOVAMENTE</button>
@@ -432,7 +443,7 @@ const Snd={
 };
 
 /* =========================================================================
-   ENTRADA — 3 FONTES: TECLADO / TOQUE / GAMEPAD (mescladas por frame)
+   ENTRADA — TECLADO / TOQUE / GAMEPAD
    ========================================================================= */
 const input={left:false,right:false,jump:false,action:false,actionPressed:false,jumpBuf:0};
 const keyInput={left:false,right:false,jump:false,action:false};
@@ -441,7 +452,6 @@ const padInput={left:false,right:false,jump:false,action:false,startHeld:false,c
 
 function pressJumpBuffer(){ input.jumpBuf=8; }
 
-/* ---------- TECLADO ---------- */
 window.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   const blocked=['arrowleft','arrowright','arrowup','arrowdown',' ','spacebar','enter'];
@@ -466,7 +476,6 @@ window.addEventListener('keyup',e=>{
   else if(k==='e'||k==='enter') keyInput.action=false;
 });
 
-/* ---------- TOQUE ---------- */
 function bindTouchButtons(){
   document.querySelectorAll('#touch .tbtn').forEach(btn=>{
     const key=btn.dataset.key;
@@ -500,6 +509,107 @@ function isBtnDown(gp, idx){
   const b=gp.buttons[idx];
   return !!(b && (b.pressed || b.value>0.5));
 }
+
+/* ---------- NAVEGAÇÃO DE INTERFACE POR GAMEPAD ---------- */
+let uiFocusIndex=0, uiFocusEls=[], uiNavCooldown=0, uiLastDir=0, lastUIState=null;
+const uiPadState={a:false,b:false,start:false};
+
+function getFocusableElements(){
+  const active=document.querySelector('.screen.active');
+  if(!active) return [];
+  return Array.from(active.querySelectorAll('button, [data-act], .opt')).filter(el=>{
+    if(el.disabled) return false;
+    if(el.classList.contains('hidden')) return false;
+    const cs=getComputedStyle(el);
+    if(cs.display==='none'||cs.visibility==='hidden') return false;
+    return el.offsetWidth>0 || el.offsetHeight>0 || el.getClientRects().length>0;
+  });
+}
+function applyFocus(){
+  uiFocusEls.forEach(el=>el.classList.remove('focus'));
+  if(!uiFocusEls.length) return;
+  uiFocusIndex=(uiFocusIndex+uiFocusEls.length)%uiFocusEls.length;
+  const el=uiFocusEls[uiFocusIndex];
+  el.classList.add('focus');
+  try{ el.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(e){}
+}
+function refreshFocus(reset){
+  const old=uiFocusEls[uiFocusIndex];
+  uiFocusEls=getFocusableElements();
+  if(reset) uiFocusIndex=0;
+  else{
+    const idx=uiFocusEls.indexOf(old);
+    uiFocusIndex=idx>=0?idx:0;
+  }
+  applyFocus();
+}
+function focusElement(el){
+  uiFocusEls=getFocusableElements();
+  const idx=uiFocusEls.indexOf(el);
+  if(idx>=0){ uiFocusIndex=idx; applyFocus(); }
+  else refreshFocus(true);
+}
+function moveFocus(delta){
+  if(!uiFocusEls.length) refreshFocus(true);
+  if(!uiFocusEls.length) return;
+  uiFocusIndex=(uiFocusIndex+delta+uiFocusEls.length)%uiFocusEls.length;
+  applyFocus();
+  Snd.tone(660,0.03,'square',0.05);
+}
+function confirmFocus(){
+  if(!uiFocusEls.length) refreshFocus(true);
+  const el=uiFocusEls[uiFocusIndex];
+  if(el && !el.disabled){ el.click(); }
+}
+function uiBackAction(){
+  if(game.state==='paused'){ doResume(); return; }
+  if(game.state==='howto'||game.state==='credits'){ showScreen('menu'); return; }
+  if(game.state==='review'){ showScreen('results'); return; }
+  if(game.state==='results'){ showScreen('victory'); return; }
+  if(game.state==='question' && qAnswered){ closeQuestion(); return; }
+}
+function handleGamepadUI(gp){
+  if(game.state==='playing'){ lastUIState=game.state; return; }
+  const a=isBtnDown(gp,0);
+  const b=isBtnDown(gp,1);
+  const start=isBtnDown(gp,9);
+
+  if(game.state!==lastUIState){
+    lastUIState=game.state;
+    uiPadState.a=a; uiPadState.b=b; uiPadState.start=start;
+    uiLastDir=0; uiNavCooldown=0;
+    refreshFocus(true);
+    return;
+  }
+
+  if(a && !uiPadState.a) confirmFocus();
+  if(b && !uiPadState.b) uiBackAction();
+  if(start && !uiPadState.start){
+    if(game.state==='paused') doResume();
+  }
+  uiPadState.a=a; uiPadState.b=b; uiPadState.start=start;
+
+  if(uiNavCooldown>0) uiNavCooldown--;
+  const ax=gp.axes[0]||0, ay=gp.axes[1]||0;
+  let dir=0;
+  if(isBtnDown(gp,12)||ay<-0.55) dir=-1;
+  else if(isBtnDown(gp,13)||ay>0.55) dir=1;
+  else if(isBtnDown(gp,14)||ax<-0.55) dir=-1;
+  else if(isBtnDown(gp,15)||ax>0.55) dir=1;
+
+  if(dir!==0){
+    const changed=dir!==uiLastDir;
+    if(changed || uiNavCooldown<=0){
+      moveFocus(dir);
+      uiNavCooldown=changed?14:7;
+    }
+    uiLastDir=dir;
+  }else{
+    uiLastDir=0;
+    uiNavCooldown=0;
+  }
+}
+
 function pollGamepad(){
   if(!navigator.getGamepads) return;
   let gp=null;
@@ -516,6 +626,7 @@ function pollGamepad(){
       padInput.connected=false;
       padInput.left=padInput.right=padInput.jump=padInput.action=false;
       padInput.startHeld=false;
+      lastUIState=null;
     }
     return;
   }
@@ -531,10 +642,9 @@ function pollGamepad(){
   const dpadL=isBtnDown(gp,14), dpadR=isBtnDown(gp,15);
   padInput.left  = ax<-DEADZONE || dpadL;
   padInput.right = ax> DEADZONE || dpadR;
-  padInput.jump   = isBtnDown(gp,0) || isBtnDown(gp,12);   // A ou D-pad ↑
-  padInput.action = isBtnDown(gp,1) || isBtnDown(gp,2) || isBtnDown(gp,3); // B/X/Y
+  padInput.jump   = isBtnDown(gp,0) || isBtnDown(gp,12);
+  padInput.action = isBtnDown(gp,1) || isBtnDown(gp,2) || isBtnDown(gp,3);
 
-  // Pausa via START (edge)
   const startNow=isBtnDown(gp,9);
   if(startNow && !padInput.startHeld){
     if(typeof game!=='undefined'){
@@ -543,9 +653,10 @@ function pollGamepad(){
     }
   }
   padInput.startHeld=startNow;
+
+  if(typeof game!=='undefined') handleGamepadUI(gp);
 }
 
-/* ---------- MERGE POR FRAME ---------- */
 function mergeInputs(){
   const prevJump=input.jump;
   const prevAction=input.action;
@@ -560,63 +671,290 @@ function mergeInputs(){
 }
 
 /* =========================================================================
-   BANCO DE MISSÕES OBRIGATÓRIAS (8, ordem fixa)
+   BANCO DE PERGUNTAS — APRENDIZAGEM EM SERVIÇOS DE SUPERMERCADOS
+   48 questões: UC3(6), UC7(8), UC8(12), UC10(8), UC11(7), UC12(7)
    ========================================================================= */
-const MISSIONS=[
-  { id:1, phase:0, type:'single',
-    q:'Qual é a faixa etária geral para participar do Programa de Aprendizagem Profissional?',
-    a:['De 12 a 18 anos.','De 14 anos completos até antes dos 24 anos.','A partir dos 18 anos, sem limite.','Somente entre 16 e 21 anos.'],
-    correct:1,
-    why:'Essa é a faixa etária geral. Para pessoas com deficiência, não há limite máximo de idade.' },
-  { id:2, phase:0, type:'single',
-    q:'Quem ainda não concluiu o Ensino Médio, em regra, precisa:',
-    a:['Estar matriculado e frequentar a escola regular.','Ter apenas um currículo atualizado.','Frequentar somente um curso livre.','Esperar concluir o Ensino Médio para procurar vagas.'],
-    correct:0,
-    why:'A matrícula e a frequência escolar são exigidas para quem ainda não concluiu o Ensino Médio, além dos demais requisitos aplicáveis.' },
-  { id:3, phase:1, type:'single',
-    q:'Você quer encontrar uma vaga de Jovem Aprendiz em uma empresa do comércio. Qual é uma boa estratégia?',
-    a:['Esperar a empresa entrar em contato.','Enviar documentos pessoais para qualquer perfil.','Pesquisar sites oficiais das empresas e canais confiáveis de vagas.','Procurar somente indicações de amigos.'],
-    correct:2,
-    why:'Esses canais ajudam a encontrar oportunidades e conferir os requisitos e as orientações para candidatura.' },
-  { id:4, phase:2, type:'single',
-    q:'Qual afirmação sobre as inscrições para vagas de Jovem Aprendiz está correta?',
-    a:['Todas as inscrições são feitas diretamente no SENAC.','É preciso conferir onde a empresa recebe candidaturas.','Basta comparecer à empresa sem consultar a vaga.','A inscrição só pode ser feita presencialmente.'],
-    correct:1,
-    why:'As inscrições para vagas de emprego dependem da empresa contratante ou do canal indicado na divulgação. O SENAC oferece formação profissional, mas não realiza necessariamente a inscrição em cada vaga.' },
-  { id:5, phase:2, type:'multi',
-    q:'Quais atitudes podem ajudar você a buscar uma oportunidade de Jovem Aprendiz? Selecione todas as opções corretas.',
-    a:['Manter o currículo atualizado.','Conferir os requisitos e os prazos das vagas.','Pagar uma taxa para garantir a contratação.','Acompanhar os canais oficiais das empresas.'],
-    correctSet:[0,1,3],
-    why:'Um currículo atualizado, atenção aos requisitos e acompanhamento de canais oficiais ajudam na busca. Desconfie de cobranças para garantir contratação.' },
-  { id:6, phase:3, type:'tf',
-    q:'O SENAC oferece formação profissional, mas participar de um curso não garante automaticamente a contratação por uma empresa.',
-    a:['Verdadeiro.','Falso.'],
-    correct:0,
-    why:'A formação contribui para desenvolver competências profissionais, mas a contratação depende do processo seletivo e dos critérios da empresa.' },
-  { id:7, phase:3, type:'tf',
-    q:'Se uma vaga de Jovem Aprendiz estiver divulgada na internet, é seguro enviar seus dados sem verificar quem publicou o anúncio.',
-    a:['Verdadeiro.','Falso.'],
-    correct:1,
-    why:'Verifique a empresa e o canal oficial antes de compartilhar dados pessoais. A divulgação na internet, por si só, não comprova que a vaga seja legítima.' },
-  { id:8, phase:4, type:'single',
-    q:'Você quer dar o primeiro passo para conquistar uma oportunidade como Jovem Aprendiz. O que faz sentido?',
-    a:['Desistir porque ainda não tenho experiência.','Acreditar no meu potencial e buscar vagas compatíveis com meu perfil.','Aceitar qualquer proposta sem verificar as condições.','Esperar até que todas as oportunidades cheguem até mim.'],
-    correct:1,
-    why:'Buscar oportunidades, conferir requisitos e desenvolver competências são passos práticos para avançar.' }
+const QUESTION_BANK=[
+  /* UC3 — Recursos tecnológicos no contexto social e do trabalho */
+  {id:1,uc:'UC3',type:'single',
+   q:'Um funcionário precisa verificar a quantidade de produtos disponíveis no estoque de um supermercado. Qual ferramenta pode auxiliá-lo nessa atividade?',
+   a:['Editor de imagens.','Sistema de gestão de estoque.','Reprodutor de vídeos.','Aplicativo de fotografias.'],
+   correct:1,
+   why:'O sistema de gestão de estoque registra e consulta quantidades, movimentações e informações dos produtos.'},
+  {id:2,uc:'UC3',type:'tf',
+   q:'Os sistemas informatizados ajudam a registrar movimentações, consultar informações e acompanhar processos dentro de um supermercado.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Os sistemas apoiam o registro e a consulta de informações, tornando os processos mais organizados e confiáveis.'},
+  {id:3,uc:'UC3',type:'single',
+   q:'Qual recurso tecnológico é mais adequado para consultar rapidamente o preço e a quantidade em estoque de um produto?',
+   a:['Rede social.','Sistema de gestão comercial.','Editor de texto.','Câmera fotográfica.'],
+   correct:1,
+   why:'O sistema de gestão comercial concentra informações de preço, estoque e movimentação de mercadorias.'},
+  {id:4,uc:'UC3',type:'tf',
+   q:'Uma planilha eletrônica pode ser usada para organizar informações e apoiar o controle de estoque.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Planilhas podem apoiar controles simples, desde que sejam mantidas atualizadas e conferidas.'},
+  {id:5,uc:'UC3',type:'single',
+   q:'Ao registrar a entrada de mercadorias no sistema, o funcionário deve:',
+   a:['Inventar dados para agilizar.','Registrar informações corretas e conferidas.','Apagar registros anteriores.','Deixar o registro para o fim do mês.'],
+   correct:1,
+   why:'Registros corretos garantem confiabilidade no estoque e evitam divergências.'},
+  {id:6,uc:'UC3',type:'multi',
+   q:'Quais atividades podem ser apoiadas por recursos tecnológicos no supermercado? Selecione todas as corretas.',
+   a:['Consulta de estoque.','Registro de vendas.','Cadastro de produtos.','Ignorar a validade dos produtos.'],
+   correctSet:[0,1,2],
+   why:'Consulta, registro e cadastro são atividades apoiadas por sistemas. A validade deve ser controlada, não ignorada.'},
+
+  /* UC7 — Orientar clientes sobre mercadorias, produtos e serviços */
+  {id:7,uc:'UC7',type:'single',
+   q:'Um cliente procura determinado produto, mas não sabe em qual corredor encontrá-lo. Qual deve ser a atitude do funcionário?',
+   a:['Mandar o cliente procurar sozinho.','Ignorar a solicitação.','Identificar o produto e orientar corretamente o cliente.','Informar que não é possível ajudá-lo.'],
+   correct:2,
+   why:'Orientar o cliente de forma correta e cordial faz parte de um atendimento de qualidade.'},
+  {id:8,uc:'UC7',type:'multi',
+   q:'Quais atitudes contribuem para um atendimento de qualidade? Selecione todas as corretas.',
+   a:['Escutar atentamente o cliente.','Fornecer informações corretas.','Interromper o cliente constantemente.','Tratar o consumidor com respeito e cordialidade.'],
+   correctSet:[0,1,3],
+   why:'Escuta, informação correta e respeito contribuem para o atendimento. Interromper o cliente prejudica a comunicação.'},
+  {id:9,uc:'UC7',type:'single',
+   q:'Um cliente idoso procura ajuda para encontrar um produto. O funcionário deve:',
+   a:['Atender com respeito e orientar com clareza.','Dizer que está ocupado.','Mandar o cliente procurar sozinho.','Ignorar a solicitação.'],
+   correct:0,
+   why:'O atendimento deve ser respeitoso e claro, considerando as necessidades do cliente.'},
+  {id:10,uc:'UC7',type:'tf',
+   q:'Em situações de atendimento prioritário, o funcionário deve seguir as orientações da empresa e a legislação aplicável.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'O atendimento prioritário deve seguir as normas e os procedimentos da empresa.'},
+  {id:11,uc:'UC7',type:'single',
+   q:'Ao receber uma reclamação, a atitude adequada é:',
+   a:['Discutir com o cliente.','Ouvir com atenção e encaminhar conforme o procedimento.','Ignorar a reclamação.','Culpar outro setor.'],
+   correct:1,
+   why:'Ouvir e encaminhar corretamente ajuda a resolver o problema e melhora a experiência do cliente.'},
+  {id:12,uc:'UC7',type:'multi',
+   q:'Quais atitudes demonstram postura profissional no atendimento? Selecione todas as corretas.',
+   a:['Cordialidade.','Respeito.','Interromper o cliente.','Clareza nas informações.'],
+   correctSet:[0,1,3],
+   why:'Cordialidade, respeito e clareza são características de uma postura profissional.'},
+  {id:13,uc:'UC7',type:'tf',
+   q:'Discutir com o cliente e levantar a voz ajuda a resolver melhor a situação.',
+   a:['Verdadeiro.','Falso.'],
+   correct:1,
+   why:'Discutir ou levantar a voz prejudica o atendimento. O ideal é manter a calma e seguir os procedimentos.'},
+  {id:14,uc:'UC7',type:'single',
+   q:'Um cliente pergunta sobre uma promoção. O funcionário deve:',
+   a:['Inventar informações.','Informar corretamente as condições da promoção.','Dizer que não sabe e encerrar o assunto.','Ignorar a pergunta.'],
+   correct:1,
+   why:'A informação deve ser correta e clara, evitando expectativas equivocadas.'},
+
+  /* UC8 — Abastecer o ponto de venda */
+  {id:15,uc:'UC8',type:'single',
+   q:'Um produto está acabando na gôndola, mas ainda existem caixas disponíveis no estoque. O que o funcionário deve fazer?',
+   a:['Esperar o produto acabar completamente.','Realizar a reposição, observando a organização e os procedimentos do supermercado.','Colocar todos os produtos disponíveis em qualquer espaço.','Retirar os produtos da gôndola.'],
+   correct:1,
+   why:'A reposição deve ser feita com organização e conforme os procedimentos do supermercado.'},
+  {id:16,uc:'UC8',type:'multi',
+   q:'Quais fatores devem ser considerados na organização dos produtos em estoque? Selecione todas as corretas.',
+   a:['Prazo de validade.','Condições adequadas de armazenamento.','Identificação e organização dos produtos.','Apenas o tamanho das embalagens.'],
+   correctSet:[0,1,2],
+   why:'Validade, armazenamento adequado e identificação são fatores importantes. O tamanho, sozinho, não é suficiente.'},
+  {id:17,uc:'UC8',type:'single',
+   q:'Ao perceber espaço vazio na gôndola, o funcionário deve:',
+   a:['Aguardar até o fim do turno.','Verificar o estoque e realizar a reposição.','Mudar de setor.','Esconder o espaço vazio.'],
+   correct:1,
+   why:'Identificar espaços vazios e repor os produtos mantém a loja organizada e abastecida.'},
+  {id:18,uc:'UC8',type:'tf',
+   q:'Produtos vencidos podem ser mantidos na gôndola desde que estejam organizados.',
+   a:['Verdadeiro.','Falso.'],
+   correct:1,
+   why:'Produtos vencidos não devem ser expostos para venda. Devem seguir os procedimentos de retirada e tratamento.'},
+  {id:19,uc:'UC8',type:'single',
+   q:'O armazenamento adequado de produtos deve considerar:',
+   a:['Local seco, organizado e conforme as orientações.','Qualquer lugar disponível.','Exposição direta ao sol.','Produtos empilhados sem identificação.'],
+   correct:0,
+   why:'O armazenamento adequado preserva a qualidade dos produtos e evita perdas.'},
+  {id:20,uc:'UC8',type:'multi',
+   q:'Antes de repor produtos na gôndola, é importante verificar:',
+   a:['A validade.','A integridade da embalagem.','O local correto de exposição.','Apenas a cor da embalagem.'],
+   correctSet:[0,1,2],
+   why:'Validade, embalagem e local correto são verificações necessárias antes da reposição.'},
+  {id:21,uc:'UC8',type:'single',
+   q:'Ao abastecer a gôndola, os rótulos dos produtos devem ficar:',
+   a:['Virados para trás.','Visíveis para o cliente.','Escondidos.','Removidos.'],
+   correct:1,
+   why:'Rótulos visíveis facilitam a identificação do produto pelo cliente.'},
+  {id:22,uc:'UC8',type:'tf',
+   q:'Empilhar produtos de forma segura evita acidentes e perdas.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'A organização segura reduz riscos de quedas, avarias e acidentes.'},
+  {id:23,uc:'UC8',type:'single',
+   q:'Um produto com embalagem danificada na gôndola deve ser:',
+   a:['Vendido mesmo assim.','Retirado e comunicado conforme o procedimento.','Escondido atrás dos outros.','Colocado em outro setor sem registro.'],
+   correct:1,
+   why:'Produtos danificados devem ser tratados conforme os procedimentos para evitar perdas e riscos.'},
+  {id:24,uc:'UC8',type:'multi',
+   q:'A organização do estoque facilita:',
+   a:['Localizar produtos.','Controlar a validade.','Evitar perdas.','Misturar todos os produtos.'],
+   correctSet:[0,1,2],
+   why:'Organização facilita localização, controle e prevenção de perdas.'},
+  {id:25,uc:'UC8',type:'tf',
+   q:'Misturar produtos de categorias diferentes no estoque é sempre a melhor forma de organização.',
+   a:['Verdadeiro.','Falso.'],
+   correct:1,
+   why:'A organização deve seguir critérios e procedimentos. Misturar tudo pode dificultar o controle.'},
+  {id:26,uc:'UC8',type:'single',
+   q:'Ao repor produtos, o funcionário deve respeitar:',
+   a:['A ordem de chegada e os procedimentos da empresa.','Apenas sua preferência pessoal.','Somente os produtos mais caros.','Nenhuma regra específica.'],
+   correct:0,
+   why:'Seguir os procedimentos e a ordem adequada mantém a organização e a validade sob controle.'},
+
+  /* UC10 — Comunicação e vendas */
+  {id:27,uc:'UC10',type:'single',
+   q:'Um cliente está indeciso entre dois produtos semelhantes. Como o funcionário pode ajudá-lo?',
+   a:['Escolher qualquer produto pelo cliente.','Apresentar as características e diferenças entre os produtos.','Pressionar o cliente para comprar o mais caro.','Encerrar o atendimento.'],
+   correct:1,
+   why:'Apresentar características e diferenças ajuda o cliente a decidir com segurança.'},
+  {id:28,uc:'UC10',type:'tf',
+   q:'Uma boa comunicação envolve ouvir o cliente, compreender suas necessidades e apresentar informações de maneira clara.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Ouvir, compreender e informar com clareza são elementos de uma boa comunicação.'},
+  {id:29,uc:'UC10',type:'single',
+   q:'Escuta ativa significa:',
+   a:['Ouvir com atenção e compreender a necessidade do cliente.','Falar sem parar.','Ignorar o que o cliente diz.','Interromper o cliente.'],
+   correct:0,
+   why:'A escuta ativa envolve atenção e compreensão da necessidade do cliente.'},
+  {id:30,uc:'UC10',type:'tf',
+   q:'A comunicação não verbal, como postura e expressão, também influencia o atendimento.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Postura e expressão transmitem mensagens e influenciam a percepção do cliente.'},
+  {id:31,uc:'UC10',type:'single',
+   q:'Venda complementar é:',
+   a:['Oferecer um produto relacionado de forma útil.','Pressionar o cliente a comprar.','Enganar o cliente.','Ignorar a necessidade do cliente.'],
+   correct:0,
+   why:'A venda complementar deve ser útil e respeitosa, relacionada à necessidade do cliente.'},
+  {id:32,uc:'UC10',type:'multi',
+   q:'Quais características contribuem para uma boa comunicação? Selecione todas as corretas.',
+   a:['Clareza.','Respeito.','Escuta.','Agressividade.'],
+   correctSet:[0,1,2],
+   why:'Clareza, respeito e escuta favorecem a comunicação. Agressividade prejudica o atendimento.'},
+  {id:33,uc:'UC10',type:'tf',
+   q:'Pressionar o cliente a comprar é uma estratégia recomendada de vendas.',
+   a:['Verdadeiro.','Falso.'],
+   correct:1,
+   why:'Pressionar o cliente não é recomendado. O atendimento deve ser respeitoso e informativo.'},
+  {id:34,uc:'UC10',type:'single',
+   q:'Diante de um cliente indeciso, o funcionário deve:',
+   a:['Apresentar características e benefícios dos produtos.','Escolher por ele sem explicar.','Pressionar pela compra.','Encerrar o atendimento.'],
+   correct:0,
+   why:'Apresentar informações claras ajuda o cliente a tomar uma decisão consciente.'},
+
+  /* UC11 — Logística nas operações de varejo */
+  {id:35,uc:'UC11',type:'single',
+   q:'Durante o recebimento de mercadorias, qual procedimento é importante?',
+   a:['Guardar os produtos imediatamente, sem conferência.','Conferir os produtos recebidos com os documentos e registros da entrega.','Descartar os documentos de entrega.','Misturar todos os produtos sem identificação.'],
+   correct:1,
+   why:'A conferência com documentos e registros ajuda a identificar divergências e garantir a entrada correta.'},
+  {id:36,uc:'UC11',type:'tf',
+   q:'O transporte, o recebimento e a armazenagem de mercadorias são atividades que contribuem para o funcionamento da logística em um supermercado.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Essas atividades fazem parte do fluxo logístico e contribuem para o abastecimento da loja.'},
+  {id:37,uc:'UC11',type:'single',
+   q:'No recebimento de mercadorias, a conferência de volumes ajuda a:',
+   a:['Verificar se a quantidade recebida confere com o documento.','Ignorar os documentos.','Atrasar o processo sem motivo.','Misturar produtos.'],
+   correct:0,
+   why:'A conferência de volumes verifica se o que chegou está de acordo com o registro da entrega.'},
+  {id:38,uc:'UC11',type:'tf',
+   q:'Documentos de entrega devem ser conferidos e preservados conforme o procedimento.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Os documentos apoiam a conferência e o registro correto das mercadorias recebidas.'},
+  {id:39,uc:'UC11',type:'single',
+   q:'A armazenagem no depósito deve seguir:',
+   a:['Organização e identificação dos produtos.','Qualquer espaço disponível.','Exposição ao sol.','Ausência de critérios.'],
+   correct:0,
+   why:'Organização e identificação facilitam a localização e preservam os produtos.'},
+  {id:40,uc:'UC11',type:'multi',
+   q:'São atividades de logística no varejo:',
+   a:['Recebimento de mercadorias.','Armazenagem.','Movimentação de produtos.','Ignorar a entrega.'],
+   correctSet:[0,1,2],
+   why:'Recebimento, armazenagem e movimentação fazem parte da logística. Ignorar a entrega não é adequado.'},
+  {id:41,uc:'UC11',type:'single',
+   q:'Mercadoria recebida com divergência deve ser:',
+   a:['Registrada e comunicada conforme o procedimento.','Escondida.','Vendida sem registro.','Descartada sem comunicação.'],
+   correct:0,
+   why:'Divergências devem ser registradas e comunicadas para que sejam tratadas corretamente.'},
+
+  /* UC12 — Prevenção de perdas */
+  {id:42,uc:'UC12',type:'single',
+   q:'Um funcionário identifica produtos com embalagens danificadas no estoque. Qual deve ser sua atitude?',
+   a:['Colocar os produtos imediatamente na gôndola.','Ignorar o problema.','Comunicar a situação e seguir os procedimentos de identificação e tratamento dos produtos.','Esconder os produtos danificados.'],
+   correct:2,
+   why:'Comunicar e seguir os procedimentos evita perdas e riscos para o cliente.'},
+  {id:43,uc:'UC12',type:'multi',
+   q:'Quais situações podem provocar perdas em um supermercado? Selecione todas as corretas.',
+   a:['Produtos vencidos.','Armazenamento inadequado.','Produtos danificados ou com avarias.','Conferência correta das mercadorias.'],
+   correctSet:[0,1,2],
+   why:'Vencimento, armazenamento inadequado e avarias podem provocar perdas. A conferência correta ajuda a evitar perdas.'},
+  {id:44,uc:'UC12',type:'single',
+   q:'Um produto vencido identificado deve ser:',
+   a:['Retirado e tratado conforme o procedimento.','Vendido rapidamente.','Colocado na gôndola.','Escondido entre os produtos bons.'],
+   correct:0,
+   why:'Produtos vencidos devem ser retirados e tratados conforme os procedimentos da empresa.'},
+  {id:45,uc:'UC12',type:'tf',
+   q:'Armazenamento inadequado pode provocar perdas de produtos.',
+   a:['Verdadeiro.','Falso.'],
+   correct:0,
+   why:'Condições inadequadas podem danificar produtos e gerar perdas.'},
+  {id:46,uc:'UC12',type:'multi',
+   q:'A prevenção de perdas inclui:',
+   a:['Controle de validade.','Armazenamento adequado.','Conferência de mercadorias.','Desperdício de produtos.'],
+   correctSet:[0,1,2],
+   why:'Controle de validade, armazenamento adequado e conferência ajudam a prevenir perdas.'},
+  {id:47,uc:'UC12',type:'single',
+   q:'Divergência de estoque é:',
+   a:['Diferença entre o estoque registrado e o estoque físico.','Um tipo de promoção.','Uma forma de pagamento.','Um modelo de embalagem.'],
+   correct:0,
+   why:'A divergência ocorre quando o registro não corresponde à quantidade física.'},
+  {id:48,uc:'UC12',type:'single',
+   q:'Ao identificar uma avaria em um produto, o funcionário deve:',
+   a:['Comunicar e seguir o procedimento.','Ignorar a situação.','Vender o produto mesmo assim.','Esconder o produto.'],
+   correct:0,
+   why:'A avaria deve ser comunicada e tratada conforme os procedimentos para evitar perdas e riscos.'}
 ];
 
-const BOSSES={
-  doubt:{key:'doubt',name:'A DÚVIDA DO PRIMEIRO PASSO',w:40,h:40,hp:3,
-        msg:'Conhecer os requisitos é o primeiro passo para buscar uma vaga com segurança.'},
-  chaos:{key:'chaos',name:'A DESINFORMAÇÃO',w:44,h:42,hp:4,
-        msg:'Informação confiável ajuda a encontrar oportunidades e a conferir os requisitos.'},
-  haste:{key:'haste',name:'A PRESSA DO DESESPERO',w:46,h:44,hp:5,
-        msg:'Preparação e cautela ajudam a reconhecer cobranças indevidas e a evitar armadilhas.'},
-  scam:{key:'scam',name:'O GOLPE VIRTUAL',w:44,h:44,hp:6,
-        msg:'Verifique sempre a empresa e o canal oficial antes de compartilhar dados pessoais.'},
-  guardian:{key:'guardian',name:'O GUARDIÃO DO FUTURO',w:48,h:48,hp:7,
-        msg:'Você reuniu conhecimento, iniciativa e proteção. A jornada continua com novos passos!'}
-};
+let MISSIONS=[];
+
+function shuffleArray(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    const t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+
+function pickCampaignQuestions(){
+  for(let attempt=0;attempt<240;attempt++){
+    const pool=shuffleArray(QUESTION_BANK);
+    const picked=[];
+    for(let i=0;i<pool.length && picked.length<8;i++){
+      const q=pool[i];
+      if(picked.length && picked[picked.length-1].uc===q.uc) continue;
+      picked.push(q);
+    }
+    if(picked.length===8){
+      const uniqueUcs=new Set(picked.map(q=>q.uc));
+      if(uniqueUcs.size>=5) return picked;
+    }
+  }
+  return shuffleArray(QUESTION_BANK).slice(0,8);
+}
 
 /* =========================================================================
    FASES
@@ -756,7 +1094,7 @@ const game={
 };
 
 const SAVE_KEY='desbloqueie_futuro_v1';
-let saved={best:0,unlocked:0,sound:true};
+let saved={best:0,unlocked:0,sound:true,campaign:null};
 try{ const raw=localStorage.getItem(SAVE_KEY); if(raw) saved=Object.assign(saved,JSON.parse(raw)); }catch(e){}
 function persist(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(saved)); }catch(e){} }
 
@@ -806,14 +1144,31 @@ function showScreen(name){
   Object.keys(screens).forEach(k=>screens[k].classList.remove('active'));
   if(name&&screens[name]) screens[name].classList.add('active');
   document.getElementById('pauseBtn').classList.toggle('hidden', game.state!=='playing');
+  if(name&&screens[name]) setTimeout(()=>refreshFocus(true),0);
 }
 
-function startGame(startLevel){
+function startGame(startLevel,resume){
   game.score=0; game.lives=3; game.coinsCollected=0;
   game.asked=0; game.bossesDown=0; game.special=0;
+
+  let selected=null;
+  if(resume && saved.campaign && Array.isArray(saved.campaign.ids) && saved.campaign.ids.length===8){
+    const map=new Map(QUESTION_BANK.map(q=>[q.id,q]));
+    const byId=saved.campaign.ids.map(id=>map.get(id)).filter(Boolean);
+    if(byId.length===8) selected=byId;
+  }
+  if(!selected) selected=pickCampaignQuestions();
+  MISSIONS=selected;
+
   game.missions=MISSIONS.map(m=>({
     id:m.id, completed:false, correct:false, attempts:0, wrongAttempts:0, firstTryCorrect:false
   }));
+
+  if(!resume || !saved.campaign || !Array.isArray(saved.campaign.ids) || saved.campaign.ids.length!==8){
+    saved.campaign={ids:MISSIONS.map(m=>m.id),levelIndex:startLevel||0};
+    persist();
+  }
+
   loadLevel(startLevel||0);
   showLevelIntro();
 }
@@ -864,6 +1219,7 @@ function loadLevel(i){
   const allDone=def.missionIndices.every(mi=>game.missions[mi] && game.missions[mi].correct);
   if(allDone && def.weapon) game.weapon.spawned=true;
 
+  if(saved.campaign){ saved.campaign.levelIndex=i; persist(); }
   updateCamera(true);
 }
 
@@ -935,7 +1291,7 @@ function buildResultStats(){
   const total=MISSIONS.length;
   const done=missionsCompleted();
   const wrong=wrongAttemptsTotal();
-  const pct=Math.round(done/total*100);
+  const pct=total?Math.round(done/total*100):0;
   const situation = done===total ? 'Jornada completa — todas as missões concluídas!' :
                     done>0 ? (done+' de '+total+' missões concluídas.') :
                     'Nenhuma missão concluída nesta jornada.';
@@ -965,7 +1321,7 @@ function showVictory(){
     '<b>Seu futuro começa com o primeiro passo!</b><br>'+
     'Mantenha o currículo atualizado, pesquise oportunidades em canais confiáveis, '+
     'confira os requisitos das vagas e continue investindo nos estudos. '+
-    'O Programa de Aprendizagem oferece formação profissional, mas não garante contratação automática.';
+    'A formação profissional é um passo importante, mas não garante contratação automática.';
   showScreen('victory');
 }
 
@@ -978,7 +1334,7 @@ function showReview(){
     const status=ok?'✔ CONCLUÍDA':'— NÃO RESPONDIDA CORRETAMENTE';
     const color=ok?'#8ef0a0':'#ff8fb1';
     html+='<div class="review-item">'+
-      '<b>Desafio '+m.id+':</b> '+m.q+
+      '<b>Desafio '+(i+1)+' ('+m.uc+'):</b> '+m.q+
       '<span class="status" style="color:'+color+';">'+status+'</span>'+
       '<span class="ans">💡 '+m.why+'</span>'+
       '</div>';
@@ -1019,7 +1375,7 @@ function openQuestion(qBlock){
     currentCorrectSetMulti=[];
   }
 
-  document.getElementById('q-kicker').textContent='DESAFIO '+currentMission.id+' DE '+MISSIONS.length;
+  document.getElementById('q-kicker').textContent='DESAFIO '+(qBlock.missionIndex+1)+' DE '+game.missions.length+' · '+currentMission.uc;
   document.getElementById('q-text').textContent=currentMission.q;
   const sub=document.getElementById('q-sub');
   if(currentMission.type==='multi'){
@@ -1079,7 +1435,7 @@ function awardCorrect(m){
     m.correct=true; m.completed=true;
     if(m.attempts===1) m.firstTryCorrect=true;
     game.special++;
-    game.score+=(MISSIONS[MISSIONS.findIndex(x=>x.id===m.id)].type==='multi')?250:200;
+    game.score+=(currentMission && currentMission.type==='multi')?250:200;
     maybeSpawnWeapon();
   }
 }
@@ -1096,12 +1452,14 @@ function answerSingle(idx,btn){
     Snd.sfx('correct');
     document.getElementById('q-feedback').innerHTML='✔ '+currentMission.why;
     document.getElementById('q-close').style.display='';
+    setTimeout(()=>focusElement(document.getElementById('q-close')),0);
   } else {
     m.wrongAttempts++;
     btn.classList.add('wrong'); btn.disabled=true;
     Snd.sfx('wrong');
     document.getElementById('q-feedback').textContent=
       'Não é a melhor escolha. Releia a pergunta com calma e tente novamente.';
+    setTimeout(()=>refreshFocus(true),0);
   }
 }
 
@@ -1109,6 +1467,10 @@ function confirmMulti(){
   if(qAnswered) return;
   const m=game.missions[currentQBlock.missionIndex];
   const sel=Array.from(multiSelected).sort((a,b)=>a-b);
+  if(sel.length===0){
+    document.getElementById('q-feedback').textContent='Marque ao menos uma opção antes de confirmar.';
+    return;
+  }
   const target=currentCorrectSetMulti.slice().sort((a,b)=>a-b);
   const ok=sel.length===target.length && sel.every((v,i)=>v===target[i]);
   m.attempts++;
@@ -1124,6 +1486,7 @@ function confirmMulti(){
     document.getElementById('q-feedback').innerHTML='✔ Muito bem! '+currentMission.why;
     document.getElementById('q-confirm').style.display='none';
     document.getElementById('q-close').style.display='';
+    setTimeout(()=>focusElement(document.getElementById('q-close')),0);
   } else {
     m.wrongAttempts++;
     Snd.sfx('wrong');
@@ -1133,6 +1496,7 @@ function confirmMulti(){
     });
     document.getElementById('q-feedback').textContent=
       'Sua seleção ainda não está completa ou tem opções equivocadas. Revise com atenção e tente novamente.';
+    setTimeout(()=>refreshFocus(true),0);
   }
 }
 document.getElementById('q-confirm').addEventListener('click',confirmMulti);
@@ -1142,6 +1506,8 @@ function closeQuestion(){
   document.getElementById('pauseBtn').classList.remove('hidden');
   currentQBlock=null; currentMission=null; qAnswered=false;
   multiSelected.clear();
+  document.querySelectorAll('.focus').forEach(el=>el.classList.remove('focus'));
+  uiFocusEls=[];
 }
 
 /* =========================================================================
@@ -2727,7 +3093,7 @@ function render(){
 }
 
 /* =========================================================================
-   LOOP — inclui pollGamepad + mergeInputs por frame
+   LOOP
    ========================================================================= */
 const STEP=1000/60;
 let acc=0, lastT=performance.now();
@@ -2737,7 +3103,6 @@ function loop(t){
   if(dt>100) dt=100;
   acc+=dt;
 
-  // Fontes de input mescladas por frame
   pollGamepad();
   mergeInputs();
 
@@ -2753,8 +3118,8 @@ function loop(t){
 function handleAction(act){
   Snd.init(); Snd.resume();
   switch(act){
-    case 'play': startGame(0); break;
-    case 'continue': startGame(Math.min(saved.unlocked,LEVELS.length-1)); break;
+    case 'play': startGame(0,false); break;
+    case 'continue': startGame(Math.min(saved.unlocked,LEVELS.length-1),true); break;
     case 'howto': showScreen('howto'); break;
     case 'credits': showScreen('credits'); break;
     case 'back': showScreen('menu'); break;
@@ -2764,7 +3129,7 @@ function handleAction(act){
     case 'menu': goMenu(); break;
     case 'retry': retryLevel(); break;
     case 'next': nextLevel(); break;
-    case 'again': startGame(0); break;
+    case 'again': startGame(0,false); break;
     case 'results': showScreen('results'); break;
     case 'review': showReview(); break;
     case 'qclose': closeQuestion(); break;
@@ -2796,6 +3161,18 @@ window.addEventListener('blur',()=>{
   if(game.state==='playing') doPause();
 });
 
+/* Atualiza o foco ao usar mouse/touch */
+document.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('button,[data-act],.opt');
+  if(!el) return;
+  uiFocusEls=getFocusableElements();
+  const idx=uiFocusEls.indexOf(el);
+  if(idx>=0){
+    uiFocusIndex=idx;
+    applyFocus();
+  }
+});
+
 /* ---------------- RESPONSIVIDADE ---------------- */
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0)||
               (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
@@ -2810,21 +3187,14 @@ function getViewport(){
 
 function fit(){
   const {w:W, h:H} = getViewport();
-
-  // Em telas pequenas (mobile) usamos toda a área. Em desktop mantemos margem.
   const isSmall = W < 900 || H < 520;
   const margin = isSmall ? 0 : 16;
-
   const availW = Math.max(120, W - margin*2);
   const availH = Math.max(80,  H - margin*2);
-
   let s = Math.min(availW/CW, availH/CH);
-
-  // Ajuste de escala
-  if(s >= 1) s = Math.floor(s*4)/4;   // steps de 0.25 para nitidez
+  if(s >= 1) s = Math.floor(s*4)/4;
   if(s < 0.30) s = 0.30;
   if(s > 6) s = 6;
-
   canvas.style.width  = Math.round(CW*s) + 'px';
   canvas.style.height = Math.round(CH*s) + 'px';
 }
@@ -2846,7 +3216,6 @@ function checkRotateHint(){
 document.getElementById('rotate-dismiss').addEventListener('click',()=>{
   sessionStorage.setItem('rotateDismissed','1');
   document.getElementById('rotate-hint').classList.add('hidden');
-  // Recalcula tamanho após o usuário escolher
   setTimeout(fit, 50);
 });
 
@@ -2855,23 +3224,23 @@ window.addEventListener('orientationchange',()=>{ setTimeout(()=>{ fit(); checkR
 
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', fit);
-  // NÃO usar o scroll para evitar travar em mobile
 }
 
 /* ---- GAMEPAD CONNECT/DISCONNECT ---- */
 window.addEventListener('gamepadconnected', e=>{
   gamepadIndex=e.gamepad.index;
   padInput.connected=true;
+  lastUIState=null;
   if(game.state==='playing'){
     game.flash='GAMEPAD CONECTADO!'; game.flashT=90;
   }
-  // Chuta o som/music em mobile/desktop
   Snd.init(); Snd.resume();
 });
 window.addEventListener('gamepaddisconnected', e=>{
   gamepadIndex=-1;
   padInput.connected=false;
   padInput.left=padInput.right=padInput.jump=padInput.action=false;
+  lastUIState=null;
   if(game.state==='playing'){
     game.flash='GAMEPAD DESCONECTADO'; game.flashT=90;
   }

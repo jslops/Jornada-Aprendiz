@@ -99,7 +99,6 @@
   .review-item .ans{color:#8ef0a0;font-size:11px;display:block;margin-top:4px;}
   .review-item .status{font-size:10px;font-weight:700;letter-spacing:1px;display:block;margin-top:4px;}
 
-  /* ---- FOCO PARA JOYSTICK ---- */
   .btn.focus,
   .opt.focus{
     outline:3px solid #ffffff;
@@ -110,7 +109,6 @@
   .opt.focus{background:#134a8a;}
   .opt.selected.focus{background:#1a5a9a;}
 
-  /* ---- CONTROLES DE TOQUE (OVERLAY, SEM RESERVAR ESPAÇO) ---- */
   #touch{
     position:fixed;left:0;right:0;bottom:0;
     padding:0 12px calc(10px + env(safe-area-inset-bottom, 0px));
@@ -148,7 +146,6 @@
     -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
   }
 
-  /* ---- OVERLAY "GIRE O DISPOSITIVO" ---- */
   #rotate-hint{
     position:fixed;inset:0;z-index:200;
     background:rgba(3,10,20,0.96);
@@ -503,14 +500,12 @@ function bindTouchButtons(){
   });
 }
 
-/* ---------- GAMEPAD ---------- */
 let gamepadIndex=-1;
 function isBtnDown(gp, idx){
   const b=gp.buttons[idx];
   return !!(b && (b.pressed || b.value>0.5));
 }
 
-/* ---------- NAVEGAÇÃO DE INTERFACE POR GAMEPAD ---------- */
 let uiFocusIndex=0, uiFocusEls=[], uiNavCooldown=0, uiLastDir=0, lastUIState=null;
 const uiPadState={a:false,b:false,start:false};
 
@@ -671,261 +666,57 @@ function mergeInputs(){
 }
 
 /* =========================================================================
-   BANCO DE PERGUNTAS — APRENDIZAGEM EM SERVIÇOS DE SUPERMERCADOS
-   48 questões: UC3(6), UC7(8), UC8(12), UC10(8), UC11(7), UC12(7)
+   BANCO DE PERGUNTAS
    ========================================================================= */
 const QUESTION_BANK=[
-  /* UC3 — Recursos tecnológicos no contexto social e do trabalho */
-  {id:1,uc:'UC3',type:'single',
-   q:'Um funcionário precisa verificar a quantidade de produtos disponíveis no estoque de um supermercado. Qual ferramenta pode auxiliá-lo nessa atividade?',
-   a:['Editor de imagens.','Sistema de gestão de estoque.','Reprodutor de vídeos.','Aplicativo de fotografias.'],
-   correct:1,
-   why:'O sistema de gestão de estoque registra e consulta quantidades, movimentações e informações dos produtos.'},
-  {id:2,uc:'UC3',type:'tf',
-   q:'Os sistemas informatizados ajudam a registrar movimentações, consultar informações e acompanhar processos dentro de um supermercado.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Os sistemas apoiam o registro e a consulta de informações, tornando os processos mais organizados e confiáveis.'},
-  {id:3,uc:'UC3',type:'single',
-   q:'Qual recurso tecnológico é mais adequado para consultar rapidamente o preço e a quantidade em estoque de um produto?',
-   a:['Rede social.','Sistema de gestão comercial.','Editor de texto.','Câmera fotográfica.'],
-   correct:1,
-   why:'O sistema de gestão comercial concentra informações de preço, estoque e movimentação de mercadorias.'},
-  {id:4,uc:'UC3',type:'tf',
-   q:'Uma planilha eletrônica pode ser usada para organizar informações e apoiar o controle de estoque.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Planilhas podem apoiar controles simples, desde que sejam mantidas atualizadas e conferidas.'},
-  {id:5,uc:'UC3',type:'single',
-   q:'Ao registrar a entrada de mercadorias no sistema, o funcionário deve:',
-   a:['Inventar dados para agilizar.','Registrar informações corretas e conferidas.','Apagar registros anteriores.','Deixar o registro para o fim do mês.'],
-   correct:1,
-   why:'Registros corretos garantem confiabilidade no estoque e evitam divergências.'},
-  {id:6,uc:'UC3',type:'multi',
-   q:'Quais atividades podem ser apoiadas por recursos tecnológicos no supermercado? Selecione todas as corretas.',
-   a:['Consulta de estoque.','Registro de vendas.','Cadastro de produtos.','Ignorar a validade dos produtos.'],
-   correctSet:[0,1,2],
-   why:'Consulta, registro e cadastro são atividades apoiadas por sistemas. A validade deve ser controlada, não ignorada.'},
-
-  /* UC7 — Orientar clientes sobre mercadorias, produtos e serviços */
-  {id:7,uc:'UC7',type:'single',
-   q:'Um cliente procura determinado produto, mas não sabe em qual corredor encontrá-lo. Qual deve ser a atitude do funcionário?',
-   a:['Mandar o cliente procurar sozinho.','Ignorar a solicitação.','Identificar o produto e orientar corretamente o cliente.','Informar que não é possível ajudá-lo.'],
-   correct:2,
-   why:'Orientar o cliente de forma correta e cordial faz parte de um atendimento de qualidade.'},
-  {id:8,uc:'UC7',type:'multi',
-   q:'Quais atitudes contribuem para um atendimento de qualidade? Selecione todas as corretas.',
-   a:['Escutar atentamente o cliente.','Fornecer informações corretas.','Interromper o cliente constantemente.','Tratar o consumidor com respeito e cordialidade.'],
-   correctSet:[0,1,3],
-   why:'Escuta, informação correta e respeito contribuem para o atendimento. Interromper o cliente prejudica a comunicação.'},
-  {id:9,uc:'UC7',type:'single',
-   q:'Um cliente idoso procura ajuda para encontrar um produto. O funcionário deve:',
-   a:['Atender com respeito e orientar com clareza.','Dizer que está ocupado.','Mandar o cliente procurar sozinho.','Ignorar a solicitação.'],
-   correct:0,
-   why:'O atendimento deve ser respeitoso e claro, considerando as necessidades do cliente.'},
-  {id:10,uc:'UC7',type:'tf',
-   q:'Em situações de atendimento prioritário, o funcionário deve seguir as orientações da empresa e a legislação aplicável.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'O atendimento prioritário deve seguir as normas e os procedimentos da empresa.'},
-  {id:11,uc:'UC7',type:'single',
-   q:'Ao receber uma reclamação, a atitude adequada é:',
-   a:['Discutir com o cliente.','Ouvir com atenção e encaminhar conforme o procedimento.','Ignorar a reclamação.','Culpar outro setor.'],
-   correct:1,
-   why:'Ouvir e encaminhar corretamente ajuda a resolver o problema e melhora a experiência do cliente.'},
-  {id:12,uc:'UC7',type:'multi',
-   q:'Quais atitudes demonstram postura profissional no atendimento? Selecione todas as corretas.',
-   a:['Cordialidade.','Respeito.','Interromper o cliente.','Clareza nas informações.'],
-   correctSet:[0,1,3],
-   why:'Cordialidade, respeito e clareza são características de uma postura profissional.'},
-  {id:13,uc:'UC7',type:'tf',
-   q:'Discutir com o cliente e levantar a voz ajuda a resolver melhor a situação.',
-   a:['Verdadeiro.','Falso.'],
-   correct:1,
-   why:'Discutir ou levantar a voz prejudica o atendimento. O ideal é manter a calma e seguir os procedimentos.'},
-  {id:14,uc:'UC7',type:'single',
-   q:'Um cliente pergunta sobre uma promoção. O funcionário deve:',
-   a:['Inventar informações.','Informar corretamente as condições da promoção.','Dizer que não sabe e encerrar o assunto.','Ignorar a pergunta.'],
-   correct:1,
-   why:'A informação deve ser correta e clara, evitando expectativas equivocadas.'},
-
-  /* UC8 — Abastecer o ponto de venda */
-  {id:15,uc:'UC8',type:'single',
-   q:'Um produto está acabando na gôndola, mas ainda existem caixas disponíveis no estoque. O que o funcionário deve fazer?',
-   a:['Esperar o produto acabar completamente.','Realizar a reposição, observando a organização e os procedimentos do supermercado.','Colocar todos os produtos disponíveis em qualquer espaço.','Retirar os produtos da gôndola.'],
-   correct:1,
-   why:'A reposição deve ser feita com organização e conforme os procedimentos do supermercado.'},
-  {id:16,uc:'UC8',type:'multi',
-   q:'Quais fatores devem ser considerados na organização dos produtos em estoque? Selecione todas as corretas.',
-   a:['Prazo de validade.','Condições adequadas de armazenamento.','Identificação e organização dos produtos.','Apenas o tamanho das embalagens.'],
-   correctSet:[0,1,2],
-   why:'Validade, armazenamento adequado e identificação são fatores importantes. O tamanho, sozinho, não é suficiente.'},
-  {id:17,uc:'UC8',type:'single',
-   q:'Ao perceber espaço vazio na gôndola, o funcionário deve:',
-   a:['Aguardar até o fim do turno.','Verificar o estoque e realizar a reposição.','Mudar de setor.','Esconder o espaço vazio.'],
-   correct:1,
-   why:'Identificar espaços vazios e repor os produtos mantém a loja organizada e abastecida.'},
-  {id:18,uc:'UC8',type:'tf',
-   q:'Produtos vencidos podem ser mantidos na gôndola desde que estejam organizados.',
-   a:['Verdadeiro.','Falso.'],
-   correct:1,
-   why:'Produtos vencidos não devem ser expostos para venda. Devem seguir os procedimentos de retirada e tratamento.'},
-  {id:19,uc:'UC8',type:'single',
-   q:'O armazenamento adequado de produtos deve considerar:',
-   a:['Local seco, organizado e conforme as orientações.','Qualquer lugar disponível.','Exposição direta ao sol.','Produtos empilhados sem identificação.'],
-   correct:0,
-   why:'O armazenamento adequado preserva a qualidade dos produtos e evita perdas.'},
-  {id:20,uc:'UC8',type:'multi',
-   q:'Antes de repor produtos na gôndola, é importante verificar:',
-   a:['A validade.','A integridade da embalagem.','O local correto de exposição.','Apenas a cor da embalagem.'],
-   correctSet:[0,1,2],
-   why:'Validade, embalagem e local correto são verificações necessárias antes da reposição.'},
-  {id:21,uc:'UC8',type:'single',
-   q:'Ao abastecer a gôndola, os rótulos dos produtos devem ficar:',
-   a:['Virados para trás.','Visíveis para o cliente.','Escondidos.','Removidos.'],
-   correct:1,
-   why:'Rótulos visíveis facilitam a identificação do produto pelo cliente.'},
-  {id:22,uc:'UC8',type:'tf',
-   q:'Empilhar produtos de forma segura evita acidentes e perdas.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'A organização segura reduz riscos de quedas, avarias e acidentes.'},
-  {id:23,uc:'UC8',type:'single',
-   q:'Um produto com embalagem danificada na gôndola deve ser:',
-   a:['Vendido mesmo assim.','Retirado e comunicado conforme o procedimento.','Escondido atrás dos outros.','Colocado em outro setor sem registro.'],
-   correct:1,
-   why:'Produtos danificados devem ser tratados conforme os procedimentos para evitar perdas e riscos.'},
-  {id:24,uc:'UC8',type:'multi',
-   q:'A organização do estoque facilita:',
-   a:['Localizar produtos.','Controlar a validade.','Evitar perdas.','Misturar todos os produtos.'],
-   correctSet:[0,1,2],
-   why:'Organização facilita localização, controle e prevenção de perdas.'},
-  {id:25,uc:'UC8',type:'tf',
-   q:'Misturar produtos de categorias diferentes no estoque é sempre a melhor forma de organização.',
-   a:['Verdadeiro.','Falso.'],
-   correct:1,
-   why:'A organização deve seguir critérios e procedimentos. Misturar tudo pode dificultar o controle.'},
-  {id:26,uc:'UC8',type:'single',
-   q:'Ao repor produtos, o funcionário deve respeitar:',
-   a:['A ordem de chegada e os procedimentos da empresa.','Apenas sua preferência pessoal.','Somente os produtos mais caros.','Nenhuma regra específica.'],
-   correct:0,
-   why:'Seguir os procedimentos e a ordem adequada mantém a organização e a validade sob controle.'},
-
-  /* UC10 — Comunicação e vendas */
-  {id:27,uc:'UC10',type:'single',
-   q:'Um cliente está indeciso entre dois produtos semelhantes. Como o funcionário pode ajudá-lo?',
-   a:['Escolher qualquer produto pelo cliente.','Apresentar as características e diferenças entre os produtos.','Pressionar o cliente para comprar o mais caro.','Encerrar o atendimento.'],
-   correct:1,
-   why:'Apresentar características e diferenças ajuda o cliente a decidir com segurança.'},
-  {id:28,uc:'UC10',type:'tf',
-   q:'Uma boa comunicação envolve ouvir o cliente, compreender suas necessidades e apresentar informações de maneira clara.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Ouvir, compreender e informar com clareza são elementos de uma boa comunicação.'},
-  {id:29,uc:'UC10',type:'single',
-   q:'Escuta ativa significa:',
-   a:['Ouvir com atenção e compreender a necessidade do cliente.','Falar sem parar.','Ignorar o que o cliente diz.','Interromper o cliente.'],
-   correct:0,
-   why:'A escuta ativa envolve atenção e compreensão da necessidade do cliente.'},
-  {id:30,uc:'UC10',type:'tf',
-   q:'A comunicação não verbal, como postura e expressão, também influencia o atendimento.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Postura e expressão transmitem mensagens e influenciam a percepção do cliente.'},
-  {id:31,uc:'UC10',type:'single',
-   q:'Venda complementar é:',
-   a:['Oferecer um produto relacionado de forma útil.','Pressionar o cliente a comprar.','Enganar o cliente.','Ignorar a necessidade do cliente.'],
-   correct:0,
-   why:'A venda complementar deve ser útil e respeitosa, relacionada à necessidade do cliente.'},
-  {id:32,uc:'UC10',type:'multi',
-   q:'Quais características contribuem para uma boa comunicação? Selecione todas as corretas.',
-   a:['Clareza.','Respeito.','Escuta.','Agressividade.'],
-   correctSet:[0,1,2],
-   why:'Clareza, respeito e escuta favorecem a comunicação. Agressividade prejudica o atendimento.'},
-  {id:33,uc:'UC10',type:'tf',
-   q:'Pressionar o cliente a comprar é uma estratégia recomendada de vendas.',
-   a:['Verdadeiro.','Falso.'],
-   correct:1,
-   why:'Pressionar o cliente não é recomendado. O atendimento deve ser respeitoso e informativo.'},
-  {id:34,uc:'UC10',type:'single',
-   q:'Diante de um cliente indeciso, o funcionário deve:',
-   a:['Apresentar características e benefícios dos produtos.','Escolher por ele sem explicar.','Pressionar pela compra.','Encerrar o atendimento.'],
-   correct:0,
-   why:'Apresentar informações claras ajuda o cliente a tomar uma decisão consciente.'},
-
-  /* UC11 — Logística nas operações de varejo */
-  {id:35,uc:'UC11',type:'single',
-   q:'Durante o recebimento de mercadorias, qual procedimento é importante?',
-   a:['Guardar os produtos imediatamente, sem conferência.','Conferir os produtos recebidos com os documentos e registros da entrega.','Descartar os documentos de entrega.','Misturar todos os produtos sem identificação.'],
-   correct:1,
-   why:'A conferência com documentos e registros ajuda a identificar divergências e garantir a entrada correta.'},
-  {id:36,uc:'UC11',type:'tf',
-   q:'O transporte, o recebimento e a armazenagem de mercadorias são atividades que contribuem para o funcionamento da logística em um supermercado.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Essas atividades fazem parte do fluxo logístico e contribuem para o abastecimento da loja.'},
-  {id:37,uc:'UC11',type:'single',
-   q:'No recebimento de mercadorias, a conferência de volumes ajuda a:',
-   a:['Verificar se a quantidade recebida confere com o documento.','Ignorar os documentos.','Atrasar o processo sem motivo.','Misturar produtos.'],
-   correct:0,
-   why:'A conferência de volumes verifica se o que chegou está de acordo com o registro da entrega.'},
-  {id:38,uc:'UC11',type:'tf',
-   q:'Documentos de entrega devem ser conferidos e preservados conforme o procedimento.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Os documentos apoiam a conferência e o registro correto das mercadorias recebidas.'},
-  {id:39,uc:'UC11',type:'single',
-   q:'A armazenagem no depósito deve seguir:',
-   a:['Organização e identificação dos produtos.','Qualquer espaço disponível.','Exposição ao sol.','Ausência de critérios.'],
-   correct:0,
-   why:'Organização e identificação facilitam a localização e preservam os produtos.'},
-  {id:40,uc:'UC11',type:'multi',
-   q:'São atividades de logística no varejo:',
-   a:['Recebimento de mercadorias.','Armazenagem.','Movimentação de produtos.','Ignorar a entrega.'],
-   correctSet:[0,1,2],
-   why:'Recebimento, armazenagem e movimentação fazem parte da logística. Ignorar a entrega não é adequado.'},
-  {id:41,uc:'UC11',type:'single',
-   q:'Mercadoria recebida com divergência deve ser:',
-   a:['Registrada e comunicada conforme o procedimento.','Escondida.','Vendida sem registro.','Descartada sem comunicação.'],
-   correct:0,
-   why:'Divergências devem ser registradas e comunicadas para que sejam tratadas corretamente.'},
-
-  /* UC12 — Prevenção de perdas */
-  {id:42,uc:'UC12',type:'single',
-   q:'Um funcionário identifica produtos com embalagens danificadas no estoque. Qual deve ser sua atitude?',
-   a:['Colocar os produtos imediatamente na gôndola.','Ignorar o problema.','Comunicar a situação e seguir os procedimentos de identificação e tratamento dos produtos.','Esconder os produtos danificados.'],
-   correct:2,
-   why:'Comunicar e seguir os procedimentos evita perdas e riscos para o cliente.'},
-  {id:43,uc:'UC12',type:'multi',
-   q:'Quais situações podem provocar perdas em um supermercado? Selecione todas as corretas.',
-   a:['Produtos vencidos.','Armazenamento inadequado.','Produtos danificados ou com avarias.','Conferência correta das mercadorias.'],
-   correctSet:[0,1,2],
-   why:'Vencimento, armazenamento inadequado e avarias podem provocar perdas. A conferência correta ajuda a evitar perdas.'},
-  {id:44,uc:'UC12',type:'single',
-   q:'Um produto vencido identificado deve ser:',
-   a:['Retirado e tratado conforme o procedimento.','Vendido rapidamente.','Colocado na gôndola.','Escondido entre os produtos bons.'],
-   correct:0,
-   why:'Produtos vencidos devem ser retirados e tratados conforme os procedimentos da empresa.'},
-  {id:45,uc:'UC12',type:'tf',
-   q:'Armazenamento inadequado pode provocar perdas de produtos.',
-   a:['Verdadeiro.','Falso.'],
-   correct:0,
-   why:'Condições inadequadas podem danificar produtos e gerar perdas.'},
-  {id:46,uc:'UC12',type:'multi',
-   q:'A prevenção de perdas inclui:',
-   a:['Controle de validade.','Armazenamento adequado.','Conferência de mercadorias.','Desperdício de produtos.'],
-   correctSet:[0,1,2],
-   why:'Controle de validade, armazenamento adequado e conferência ajudam a prevenir perdas.'},
-  {id:47,uc:'UC12',type:'single',
-   q:'Divergência de estoque é:',
-   a:['Diferença entre o estoque registrado e o estoque físico.','Um tipo de promoção.','Uma forma de pagamento.','Um modelo de embalagem.'],
-   correct:0,
-   why:'A divergência ocorre quando o registro não corresponde à quantidade física.'},
-  {id:48,uc:'UC12',type:'single',
-   q:'Ao identificar uma avaria em um produto, o funcionário deve:',
-   a:['Comunicar e seguir o procedimento.','Ignorar a situação.','Vender o produto mesmo assim.','Esconder o produto.'],
-   correct:0,
-   why:'A avaria deve ser comunicada e tratada conforme os procedimentos para evitar perdas e riscos.'}
+  {id:1,uc:'UC3',type:'single',q:'Um funcionário precisa verificar a quantidade de produtos disponíveis no estoque de um supermercado. Qual ferramenta pode auxiliá-lo nessa atividade?',a:['Editor de imagens.','Sistema de gestão de estoque.','Reprodutor de vídeos.','Aplicativo de fotografias.'],correct:1,why:'O sistema de gestão de estoque registra e consulta quantidades, movimentações e informações dos produtos.'},
+  {id:2,uc:'UC3',type:'tf',q:'Os sistemas informatizados ajudam a registrar movimentações, consultar informações e acompanhar processos dentro de um supermercado.',a:['Verdadeiro.','Falso.'],correct:0,why:'Os sistemas apoiam o registro e a consulta de informações, tornando os processos mais organizados e confiáveis.'},
+  {id:3,uc:'UC3',type:'single',q:'Qual recurso tecnológico é mais adequado para consultar rapidamente o preço e a quantidade em estoque de um produto?',a:['Rede social.','Sistema de gestão comercial.','Editor de texto.','Câmera fotográfica.'],correct:1,why:'O sistema de gestão comercial concentra informações de preço, estoque e movimentação de mercadorias.'},
+  {id:4,uc:'UC3',type:'tf',q:'Uma planilha eletrônica pode ser usada para organizar informações e apoiar o controle de estoque.',a:['Verdadeiro.','Falso.'],correct:0,why:'Planilhas podem apoiar controles simples, desde que sejam mantidas atualizadas e conferidas.'},
+  {id:5,uc:'UC3',type:'single',q:'Ao registrar a entrada de mercadorias no sistema, o funcionário deve:',a:['Inventar dados para agilizar.','Registrar informações corretas e conferidas.','Apagar registros anteriores.','Deixar o registro para o fim do mês.'],correct:1,why:'Registros corretos garantem confiabilidade no estoque e evitam divergências.'},
+  {id:6,uc:'UC3',type:'multi',q:'Quais atividades podem ser apoiadas por recursos tecnológicos no supermercado? Selecione todas as corretas.',a:['Consulta de estoque.','Registro de vendas.','Cadastro de produtos.','Ignorar a validade dos produtos.'],correctSet:[0,1,2],why:'Consulta, registro e cadastro são atividades apoiadas por sistemas. A validade deve ser controlada, não ignorada.'},
+  {id:7,uc:'UC7',type:'single',q:'Um cliente procura determinado produto, mas não sabe em qual corredor encontrá-lo. Qual deve ser a atitude do funcionário?',a:['Mandar o cliente procurar sozinho.','Ignorar a solicitação.','Identificar o produto e orientar corretamente o cliente.','Informar que não é possível ajudá-lo.'],correct:2,why:'Orientar o cliente de forma correta e cordial faz parte de um atendimento de qualidade.'},
+  {id:8,uc:'UC7',type:'multi',q:'Quais atitudes contribuem para um atendimento de qualidade? Selecione todas as corretas.',a:['Escutar atentamente o cliente.','Fornecer informações corretas.','Interromper o cliente constantemente.','Tratar o consumidor com respeito e cordialidade.'],correctSet:[0,1,3],why:'Escuta, informação correta e respeito contribuem para o atendimento. Interromper o cliente prejudica a comunicação.'},
+  {id:9,uc:'UC7',type:'single',q:'Um cliente idoso procura ajuda para encontrar um produto. O funcionário deve:',a:['Atender com respeito e orientar com clareza.','Dizer que está ocupado.','Mandar o cliente procurar sozinho.','Ignorar a solicitação.'],correct:0,why:'O atendimento deve ser respeitoso e claro, considerando as necessidades do cliente.'},
+  {id:10,uc:'UC7',type:'tf',q:'Em situações de atendimento prioritário, o funcionário deve seguir as orientações da empresa e a legislação aplicável.',a:['Verdadeiro.','Falso.'],correct:0,why:'O atendimento prioritário deve seguir as normas e os procedimentos da empresa.'},
+  {id:11,uc:'UC7',type:'single',q:'Ao receber uma reclamação, a atitude adequada é:',a:['Discutir com o cliente.','Ouvir com atenção e encaminhar conforme o procedimento.','Ignorar a reclamação.','Culpar outro setor.'],correct:1,why:'Ouvir e encaminhar corretamente ajuda a resolver o problema e melhora a experiência do cliente.'},
+  {id:12,uc:'UC7',type:'multi',q:'Quais atitudes demonstram postura profissional no atendimento? Selecione todas as corretas.',a:['Cordialidade.','Respeito.','Interromper o cliente.','Clareza nas informações.'],correctSet:[0,1,3],why:'Cordialidade, respeito e clareza são características de uma postura profissional.'},
+  {id:13,uc:'UC7',type:'tf',q:'Discutir com o cliente e levantar a voz ajuda a resolver melhor a situação.',a:['Verdadeiro.','Falso.'],correct:1,why:'Discutir ou levantar a voz prejudica o atendimento. O ideal é manter a calma e seguir os procedimentos.'},
+  {id:14,uc:'UC7',type:'single',q:'Um cliente pergunta sobre uma promoção. O funcionário deve:',a:['Inventar informações.','Informar corretamente as condições da promoção.','Dizer que não sabe e encerrar o assunto.','Ignorar a pergunta.'],correct:1,why:'A informação deve ser correta e clara, evitando expectativas equivocadas.'},
+  {id:15,uc:'UC8',type:'single',q:'Um produto está acabando na gôndola, mas ainda existem caixas disponíveis no estoque. O que o funcionário deve fazer?',a:['Esperar o produto acabar completamente.','Realizar a reposição, observando a organização e os procedimentos do supermercado.','Colocar todos os produtos disponíveis em qualquer espaço.','Retirar os produtos da gôndola.'],correct:1,why:'A reposição deve ser feita com organização e conforme os procedimentos do supermercado.'},
+  {id:16,uc:'UC8',type:'multi',q:'Quais fatores devem ser considerados na organização dos produtos em estoque? Selecione todas as corretas.',a:['Prazo de validade.','Condições adequadas de armazenamento.','Identificação e organização dos produtos.','Apenas o tamanho das embalagens.'],correctSet:[0,1,2],why:'Validade, armazenamento adequado e identificação são fatores importantes. O tamanho, sozinho, não é suficiente.'},
+  {id:17,uc:'UC8',type:'single',q:'Ao perceber espaço vazio na gôndola, o funcionário deve:',a:['Aguardar até o fim do turno.','Verificar o estoque e realizar a reposição.','Mudar de setor.','Esconder o espaço vazio.'],correct:1,why:'Identificar espaços vazios e repor os produtos mantém a loja organizada e abastecida.'},
+  {id:18,uc:'UC8',type:'tf',q:'Produtos vencidos podem ser mantidos na gôndola desde que estejam organizados.',a:['Verdadeiro.','Falso.'],correct:1,why:'Produtos vencidos não devem ser expostos para venda. Devem seguir os procedimentos de retirada e tratamento.'},
+  {id:19,uc:'UC8',type:'single',q:'O armazenamento adequado de produtos deve considerar:',a:['Local seco, organizado e conforme as orientações.','Qualquer lugar disponível.','Exposição direta ao sol.','Produtos empilhados sem identificação.'],correct:0,why:'O armazenamento adequado preserva a qualidade dos produtos e evita perdas.'},
+  {id:20,uc:'UC8',type:'multi',q:'Antes de repor produtos na gôndola, é importante verificar:',a:['A validade.','A integridade da embalagem.','O local correto de exposição.','Apenas a cor da embalagem.'],correctSet:[0,1,2],why:'Validade, embalagem e local correto são verificações necessárias antes da reposição.'},
+  {id:21,uc:'UC8',type:'single',q:'Ao abastecer a gôndola, os rótulos dos produtos devem ficar:',a:['Virados para trás.','Visíveis para o cliente.','Escondidos.','Removidos.'],correct:1,why:'Rótulos visíveis facilitam a identificação do produto pelo cliente.'},
+  {id:22,uc:'UC8',type:'tf',q:'Empilhar produtos de forma segura evita acidentes e perdas.',a:['Verdadeiro.','Falso.'],correct:0,why:'A organização segura reduz riscos de quedas, avarias e acidentes.'},
+  {id:23,uc:'UC8',type:'single',q:'Um produto com embalagem danificada na gôndola deve ser:',a:['Vendido mesmo assim.','Retirado e comunicado conforme o procedimento.','Escondido atrás dos outros.','Colocado em outro setor sem registro.'],correct:1,why:'Produtos danificados devem ser tratados conforme os procedimentos para evitar perdas e riscos.'},
+  {id:24,uc:'UC8',type:'multi',q:'A organização do estoque facilita:',a:['Localizar produtos.','Controlar a validade.','Evitar perdas.','Misturar todos os produtos.'],correctSet:[0,1,2],why:'Organização facilita localização, controle e prevenção de perdas.'},
+  {id:25,uc:'UC8',type:'tf',q:'Misturar produtos de categorias diferentes no estoque é sempre a melhor forma de organização.',a:['Verdadeiro.','Falso.'],correct:1,why:'A organização deve seguir critérios e procedimentos. Misturar tudo pode dificultar o controle.'},
+  {id:26,uc:'UC8',type:'single',q:'Ao repor produtos, o funcionário deve respeitar:',a:['A ordem de chegada e os procedimentos da empresa.','Apenas sua preferência pessoal.','Somente os produtos mais caros.','Nenhuma regra específica.'],correct:0,why:'Seguir os procedimentos e a ordem adequada mantém a organização e a validade sob controle.'},
+  {id:27,uc:'UC10',type:'single',q:'Um cliente está indeciso entre dois produtos semelhantes. Como o funcionário pode ajudá-lo?',a:['Escolher qualquer produto pelo cliente.','Apresentar as características e diferenças entre os produtos.','Pressionar o cliente para comprar o mais caro.','Encerrar o atendimento.'],correct:1,why:'Apresentar características e diferenças ajuda o cliente a decidir com segurança.'},
+  {id:28,uc:'UC10',type:'tf',q:'Uma boa comunicação envolve ouvir o cliente, compreender suas necessidades e apresentar informações de maneira clara.',a:['Verdadeiro.','Falso.'],correct:0,why:'Ouvir, compreender e informar com clareza são elementos de uma boa comunicação.'},
+  {id:29,uc:'UC10',type:'single',q:'Escuta ativa significa:',a:['Ouvir com atenção e compreender a necessidade do cliente.','Falar sem parar.','Ignorar o que o cliente diz.','Interromper o cliente.'],correct:0,why:'A escuta ativa envolve atenção e compreensão da necessidade do cliente.'},
+  {id:30,uc:'UC10',type:'tf',q:'A comunicação não verbal, como postura e expressão, também influencia o atendimento.',a:['Verdadeiro.','Falso.'],correct:0,why:'Postura e expressão transmitem mensagens e influenciam a percepção do cliente.'},
+  {id:31,uc:'UC10',type:'single',q:'Venda complementar é:',a:['Oferecer um produto relacionado de forma útil.','Pressionar o cliente a comprar.','Enganar o cliente.','Ignorar a necessidade do cliente.'],correct:0,why:'A venda complementar deve ser útil e respeitosa, relacionada à necessidade do cliente.'},
+  {id:32,uc:'UC10',type:'multi',q:'Quais características contribuem para uma boa comunicação? Selecione todas as corretas.',a:['Clareza.','Respeito.','Escuta.','Agressividade.'],correctSet:[0,1,2],why:'Clareza, respeito e escuta favorecem a comunicação. Agressividade prejudica o atendimento.'},
+  {id:33,uc:'UC10',type:'tf',q:'Pressionar o cliente a comprar é uma estratégia recomendada de vendas.',a:['Verdadeiro.','Falso.'],correct:1,why:'Pressionar o cliente não é recomendado. O atendimento deve ser respeitoso e informativo.'},
+  {id:34,uc:'UC10',type:'single',q:'Diante de um cliente indeciso, o funcionário deve:',a:['Apresentar características e benefícios dos produtos.','Escolher por ele sem explicar.','Pressionar pela compra.','Encerrar o atendimento.'],correct:0,why:'Apresentar informações claras ajuda o cliente a tomar uma decisão consciente.'},
+  {id:35,uc:'UC11',type:'single',q:'Durante o recebimento de mercadorias, qual procedimento é importante?',a:['Guardar os produtos imediatamente, sem conferência.','Conferir os produtos recebidos com os documentos e registros da entrega.','Descartar os documentos de entrega.','Misturar todos os produtos sem identificação.'],correct:1,why:'A conferência com documentos e registros ajuda a identificar divergências e garantir a entrada correta.'},
+  {id:36,uc:'UC11',type:'tf',q:'O transporte, o recebimento e a armazenagem de mercadorias são atividades que contribuem para o funcionamento da logística em um supermercado.',a:['Verdadeiro.','Falso.'],correct:0,why:'Essas atividades fazem parte do fluxo logístico e contribuem para o abastecimento da loja.'},
+  {id:37,uc:'UC11',type:'single',q:'No recebimento de mercadorias, a conferência de volumes ajuda a:',a:['Verificar se a quantidade recebida confere com o documento.','Ignorar os documentos.','Atrasar o processo sem motivo.','Misturar produtos.'],correct:0,why:'A conferência de volumes verifica se o que chegou está de acordo com o registro da entrega.'},
+  {id:38,uc:'UC11',type:'tf',q:'Documentos de entrega devem ser conferidos e preservados conforme o procedimento.',a:['Verdadeiro.','Falso.'],correct:0,why:'Os documentos apoiam a conferência e o registro correto das mercadorias recebidas.'},
+  {id:39,uc:'UC11',type:'single',q:'A armazenagem no depósito deve seguir:',a:['Organização e identificação dos produtos.','Qualquer espaço disponível.','Exposição ao sol.','Ausência de critérios.'],correct:0,why:'Organização e identificação facilitam a localização e preservam os produtos.'},
+  {id:40,uc:'UC11',type:'multi',q:'São atividades de logística no varejo:',a:['Recebimento de mercadorias.','Armazenagem.','Movimentação de produtos.','Ignorar a entrega.'],correctSet:[0,1,2],why:'Recebimento, armazenagem e movimentação fazem parte da logística. Ignorar a entrega não é adequado.'},
+  {id:41,uc:'UC11',type:'single',q:'Mercadoria recebida com divergência deve ser:',a:['Registrada e comunicada conforme o procedimento.','Escondida.','Vendida sem registro.','Descartada sem comunicação.'],correct:0,why:'Divergências devem ser registradas e comunicadas para que sejam tratadas corretamente.'},
+  {id:42,uc:'UC12',type:'single',q:'Um funcionário identifica produtos com embalagens danificadas no estoque. Qual deve ser sua atitude?',a:['Colocar os produtos imediatamente na gôndola.','Ignorar o problema.','Comunicar a situação e seguir os procedimentos de identificação e tratamento dos produtos.','Esconder os produtos danificados.'],correct:2,why:'Comunicar e seguir os procedimentos evita perdas e riscos para o cliente.'},
+  {id:43,uc:'UC12',type:'multi',q:'Quais situações podem provocar perdas em um supermercado? Selecione todas as corretas.',a:['Produtos vencidos.','Armazenamento inadequado.','Produtos danificados ou com avarias.','Conferência correta das mercadorias.'],correctSet:[0,1,2],why:'Vencimento, armazenamento inadequado e avarias podem provocar perdas. A conferência correta ajuda a evitar perdas.'},
+  {id:44,uc:'UC12',type:'single',q:'Um produto vencido identificado deve ser:',a:['Retirado e tratado conforme o procedimento.','Vendido rapidamente.','Colocado na gôndola.','Escondido entre os produtos bons.'],correct:0,why:'Produtos vencidos devem ser retirados e tratados conforme os procedimentos da empresa.'},
+  {id:45,uc:'UC12',type:'tf',q:'Armazenamento inadequado pode provocar perdas de produtos.',a:['Verdadeiro.','Falso.'],correct:0,why:'Condições inadequadas podem danificar produtos e gerar perdas.'},
+  {id:46,uc:'UC12',type:'multi',q:'A prevenção de perdas inclui:',a:['Controle de validade.','Armazenamento adequado.','Conferência de mercadorias.','Desperdício de produtos.'],correctSet:[0,1,2],why:'Controle de validade, armazenamento adequado e conferência ajudam a prevenir perdas.'},
+  {id:47,uc:'UC12',type:'single',q:'Divergência de estoque é:',a:['Diferença entre o estoque registrado e o estoque físico.','Um tipo de promoção.','Uma forma de pagamento.','Um modelo de embalagem.'],correct:0,why:'A divergência ocorre quando o registro não corresponde à quantidade física.'},
+  {id:48,uc:'UC12',type:'single',q:'Ao identificar uma avaria em um produto, o funcionário deve:',a:['Comunicar e seguir o procedimento.','Ignorar a situação.','Vender o produto mesmo assim.','Esconder o produto.'],correct:0,why:'A avaria deve ser comunicada e tratada conforme os procedimentos para evitar perdas e riscos.'}
 ];
 
 let MISSIONS=[];
@@ -1064,6 +855,37 @@ const LEVELS=[
   boss:{key:'guardian',x:1480}
 }
 ];
+
+/* =========================================================================
+   DEFINIÇÃO DOS CHEFES  ← ESTE BLOCO FALTAVA (causava o travamento)
+   ========================================================================= */
+const BOSSES={
+  doubt:{
+    key:'doubt', name:'A DÚVIDA',
+    msg:'Você venceu a Dúvida! Acreditar no próprio potencial é o primeiro passo.',
+    w:42, h:40, hp:6
+  },
+  chaos:{
+    key:'chaos', name:'O CAOS',
+    msg:'Você venceu o Caos! Organização e informação abrem caminhos.',
+    w:44, h:42, hp:8
+  },
+  haste:{
+    key:'haste', name:'A PRESSA',
+    msg:'Você venceu a Pressa! Planejamento e atenção aos detalhes fazem a diferença.',
+    w:46, h:44, hp:9
+  },
+  scam:{
+    key:'scam', name:'O GOLPE',
+    msg:'Você venceu o Golpe! Proteja seus dados e desconfie de promessas fáceis.',
+    w:46, h:44, hp:10
+  },
+  guardian:{
+    key:'guardian', name:'O GUARDIÃO DO FUTURO',
+    msg:'Você venceu o Guardião do Futuro! Seu futuro começa agora.',
+    w:52, h:48, hp:12
+  }
+};
 
 /* =========================================================================
    ESTADO
@@ -1270,9 +1092,10 @@ function finishLevel(){
   saved.unlocked=Math.max(saved.unlocked,game.levelIndex+1);
   if(game.score>saved.best) saved.best=game.score;
   persist();
+  const bossDef=BOSSES[game.level.boss.key];
   document.getElementById('clear-title').textContent=game.level.name;
   document.getElementById('clear-msg').textContent=
-    (BOSSES[game.level.boss.key].msg||'Fase concluída!')+' Bônus de '+bonus+' pontos.';
+    ((bossDef && bossDef.msg) || 'Fase concluída!')+' Bônus de '+bonus+' pontos.';
   document.getElementById('clear-stats').innerHTML=
     '<div>Pontuação: <b>'+pad(game.score,5)+'</b></div>'+
     '<div>Moedas: <b>'+game.coinsCollected+'</b></div>'+
@@ -1604,7 +1427,7 @@ function updatePlayer(){
   moveAndCollide(p);
   p.anim+=Math.abs(p.vx)+0.35;
 
-  if(p.y>L.height+60) killPlayer();
+  if(p.y>L.height+60){ killPlayer(); return; }
 
   if(!game.checkpointReached && p.x>L.checkpoint.x){
     game.checkpointReached=true;
@@ -1802,6 +1625,7 @@ function updateEnemies(){
 
 function startBossFight(){
   const def=BOSSES[game.level.boss.key];
+  if(!def){ return; }
   const groundY=200;
   game.boss={
     key:def.key,name:def.name,msg:def.msg,w:def.w,h:def.h,
@@ -2688,7 +2512,6 @@ function drawPlayerBeams(){
   }
 }
 
-/* -------------------- DESENHO DOS CHEFES -------------------- */
 function drawBoss(){
   const b=game.boss; if(!b) return;
   const x=Math.round(b.x), y=Math.round(b.y);
@@ -3034,9 +2857,6 @@ function drawHUD(){
   }
 }
 
-/* =========================================================================
-   RENDER
-   ========================================================================= */
 function render(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.imageSmoothingEnabled=false;
@@ -3161,7 +2981,6 @@ window.addEventListener('blur',()=>{
   if(game.state==='playing') doPause();
 });
 
-/* Atualiza o foco ao usar mouse/touch */
 document.addEventListener('pointerdown',e=>{
   const el=e.target.closest('button,[data-act],.opt');
   if(!el) return;
@@ -3173,7 +2992,6 @@ document.addEventListener('pointerdown',e=>{
   }
 });
 
-/* ---------------- RESPONSIVIDADE ---------------- */
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0)||
               (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
 
@@ -3199,7 +3017,6 @@ function fit(){
   canvas.style.height = Math.round(CH*s) + 'px';
 }
 
-/* ---- HINT DE ORIENTAÇÃO ---- */
 function checkRotateHint(){
   const el=document.getElementById('rotate-hint');
   if(!el) return;
@@ -3226,7 +3043,6 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('resize', fit);
 }
 
-/* ---- GAMEPAD CONNECT/DISCONNECT ---- */
 window.addEventListener('gamepadconnected', e=>{
   gamepadIndex=e.gamepad.index;
   padInput.connected=true;
@@ -3246,9 +3062,6 @@ window.addEventListener('gamepaddisconnected', e=>{
   }
 });
 
-/* =========================================================================
-   INICIALIZAÇÃO
-   ========================================================================= */
 function init(){
   if(isTouch && Math.min(window.innerWidth,window.innerHeight) < 900){
     document.getElementById('touch').classList.remove('hidden');
